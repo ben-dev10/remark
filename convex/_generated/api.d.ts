@@ -9,6 +9,8 @@
  */
 
 import type * as comments_comments from "../comments/comments.js";
+import type * as http from "../http.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -18,6 +20,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   "comments/comments": typeof comments_comments;
+  http: typeof http;
+  users: typeof users;
 }>;
 
 /**

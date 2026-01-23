@@ -5,6 +5,7 @@ import { query, mutation } from "../_generated/server";
 // Get all comments for a post
 export const getCommentsByPost = query({
   args: { postId: v.string() },
+
   handler: async (ctx, args) => {
     const comments = await ctx.db
       .query("comments")
@@ -37,6 +38,7 @@ export const createComment = mutation({
     content: v.string(),
     parentCommentId: v.optional(v.id("comments")),
   },
+  
   handler: async (ctx, args) => {
     // Get the current user (we'll set up auth next)
     const identity = await ctx.auth.getUserIdentity();
@@ -72,6 +74,7 @@ export const updateComment = mutation({
     commentId: v.id("comments"),
     content: v.string(),
   },
+
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
@@ -102,6 +105,7 @@ export const updateComment = mutation({
 // Delete a comment (soft delete)
 export const deleteComment = mutation({
   args: { commentId: v.id("comments") },
+
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {

@@ -24,7 +24,9 @@
       "@/.source": ["./.source/server.ts"],
       "@/ui/*": ["./src/components/ui/*"],
       "@/utils/*": ["./src/utils/*"],
+      "@/styles/*": ["./src/styles/*"],
       "@/lib/*": ["./src/utils/lib/*"],
+      "@/convex/*": ["./convex/*"],
       "@/mdx-components": ["./mdx-components.tsx"],
       "fumadocs-mdx:collections/*": [".source/*"]
     }

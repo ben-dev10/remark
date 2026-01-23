@@ -2,8 +2,10 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@import 'fumadocs-ui/css/neutral.css';
-@import 'fumadocs-ui/css/preset.css';
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+@import "../styles/editor.css";
+@import "@clerk/themes/shadcn.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -92,7 +94,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.87 0.00 0);
+  --primary: oklch(0.87 0 0);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -126,4 +128,41 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .container,
+  [datatype="container"] {
+    @apply mx-auto max-w-4xl;
+  }
+  .container-5xl,
+  [datatype="container-5xl"] {
+    @apply mx-auto max-w-5xl;
+  }
+  .container-6xl,
+  [datatype="container-6xl"] {
+    @apply mx-auto max-w-6xl;
+  }
+  .container-7xl,
+  [datatype="container-7xl"] {
+    @apply mx-auto max-w-7xl;
+  }
+  .container-8xl,
+  [datatype="container-8xl"] {
+    @apply mx-auto max-w-[1440px];
+  }
+}
+
+@utility debug {
+  border: 1px solid red;
+}
+@utility debug-y {
+  border: 1px solid yellow;
+}
+@utility debug-g {
+  border: 1px solid green;
 }
