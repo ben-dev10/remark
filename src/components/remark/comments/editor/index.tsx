@@ -11,10 +11,17 @@ import {
 } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import { Bold, Code, Italic, Strikethrough } from "lucide-react";
+import { Bold, Code, Italic, LinkIcon, Strikethrough } from "lucide-react";
 import { cn } from "@/utils/lib/utils";
 import { cva } from "class-variance-authority";
 import Placeholder from "@tiptap/extension-placeholder";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { HyperLink } from "./hyper-links";
 
 export type CommentEditorProps = Editor;
 
@@ -28,21 +35,26 @@ export interface EditorProps {
   editorProps?: HTMLAttributes<HTMLDivElement>;
   children?: ReactNode;
   onReady?: (editor: Editor) => void;
+  // maxCharacters?: number;
 
   containerProps?: HTMLAttributes<HTMLDivElement>;
 }
 
 export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
   function CommentEditor(
-    { disabled = false, onChange, onReady, containerProps, children, ...props },
+    {
+      disabled = false,
+      onChange,
+      // maxCharacters = 3000,
+      onReady,
+      containerProps,
+      children,
+      ...props
+    },
     ref,
   ) {
     const [editor, setEditor] = useState<Editor | null>(null);
     const editorRef = useRef<Editor | null>(null);
-
-    //   const onChangeRef = useRef(onChange);
-    //  const disabledRef = useRef(disabled);
-    //   const onReadyRef = useRef(onReady);
 
     // force editor props to be immutable
     const propsRef = useRef({
@@ -50,11 +62,12 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
       disabled,
       onChange,
       onReady,
+      // maxCharacters,
     });
 
     useLayoutEffect(() => {
+      // create a new editor instance
       const instance = new Editor({
-        // editable: !disabledRef.current,
         editable: !propsRef.current.disabled,
         extensions: [
           StarterKit.configure({
@@ -63,14 +76,19 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
           }),
           Link.configure({
             openOnClick: false,
+            validate: (url) => {
+              return /^https?:\/\//.test(url);
+            },
+            HTMLAttributes: {
+              class: "text-blue-500 hover:underline",
+            },
           }),
           Placeholder.configure({
-            // placeholder: props.placeholder || "Write a comment…",
             placeholder: propsRef.current.placeholder || "Write a comment…",
             showOnlyWhenEditable: true,
           }),
         ],
-        content: "",
+        content: propsRef.current.defaultValue || "",
         editorProps: {
           attributes: {
             class: "",
@@ -78,14 +96,12 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
           },
         },
         onUpdate({ editor }) {
-          // onChangeRef.current?.(editor);
           propsRef.current.onChange?.(editor);
         },
       });
 
       editorRef.current = instance;
       setEditor(instance);
-      // onReadyRef.current?.(instance);
       propsRef.current.onReady?.(instance);
 
       return () => {
@@ -113,7 +129,7 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
         {...containerProps}
         ref={ref}
         aria-disabled={disabled}
-        className="_comment-editor  border"
+        className="_comment-editor border-b-0 p-2 px-3 border"
       >
         <EditorContent
           editor={editor}
@@ -121,8 +137,8 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
           className="tiptap outline-none! rounded-md"
         />
 
-        <div className="_action-btns flex justify-between">
-          <div className="">
+        <div className="_btns flex mt-2 justify-between">
+          <div className="_markup-btns py-2 flex">
             <MarkButton
               editor={editor}
               name="bold"
@@ -143,6 +159,9 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
               name="code"
               icon={<Code className="size-4" />}
             />
+
+            <div className="_divider border-l my-0.5 border-primary/50 mx-2" />
+            <InsertLink editor={editor} />
           </div>
           <div className="_post-action-btn">{children}</div>
         </div>
@@ -194,6 +213,34 @@ function MarkButton({
     >
       {icon}
     </button>
+  );
+}
+
+function InsertLink({ editor }: { editor: Editor }): React.ReactElement {
+  useHookUpdate(editor);
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Dialog onOpenChange={setIsOpen} open={isOpen}>
+      <DialogTrigger
+        type="button"
+        aria-label="Toggle Link"
+        className={cn(toggleVariants({ active: editor.isActive("link") }))}
+        disabled={!editor.can().setLink({ href: "" }) || !editor.isEditable}
+      >
+        <LinkIcon className="size-4" />
+      </DialogTrigger>
+      <DialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+        <DialogTitle>Add Link</DialogTitle>
+        <HyperLink
+          editor={editor}
+          onClose={() => {
+            setIsOpen(false);
+            editor.commands.focus();
+          }}
+        />
+      </DialogContent>
+    </Dialog>
   );
 }
 

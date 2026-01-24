@@ -10,6 +10,10 @@ import { toast } from "sonner";
 import { Send } from "lucide-react";
 import type { CreateComment } from "@/utils/types/convex";
 import { Button } from "@/components/ui/button";
+import { useOnline } from "@/hooks/useOnline";
+import { validateCommentContent } from "./validators";
+
+const maxCharacters = 500;
 
 interface CommentFormProps {
   postId: CreateComment["postId"];
@@ -23,6 +27,8 @@ export default function CommentsForm({
   const editorRef = useRef<Editor | null>(null);
   const { isSignedIn } = useUser();
   const [submitting, setSubmitting] = useState(false);
+  const isOnline = useOnline();
+  const [charCount, setCharCount] = useState(0);
 
   const createComment = useMutation(api.comments.comments.createComment);
 
@@ -31,6 +37,12 @@ export default function CommentsForm({
 
     // cancel submit if content is empty
     if (!editor || editor.isEmpty) return;
+    // Validate content
+    const validation = validateCommentContent(editor, maxCharacters);
+    if (!validation.isValid) {
+      toast.error(validation.error);
+      return;
+    }
 
     const content = JSON.stringify(editor.getJSON());
 
@@ -44,6 +56,8 @@ export default function CommentsForm({
       });
 
       editor.commands.clearContent();
+      setCharCount(0);
+      toast.success("Comment posted successfully!");
     } catch (error) {
       toast.error("Failed to post comment. Please try again.");
       console.error("Failed to post comment:", error);
@@ -55,8 +69,17 @@ export default function CommentsForm({
   function handleCancel() {
     if (editorRef.current) {
       editorRef.current.commands.clearContent();
+      setCharCount(0);
     }
   }
+
+  function handleEditorChange(editor: Editor) {
+    const text = editor.getText().trim();
+    setCharCount(text.length);
+  }
+
+  const isOverLimit = charCount > maxCharacters;
+  const isNearLimit = charCount > maxCharacters * 0.8;
 
   return (
     <form
@@ -71,24 +94,44 @@ export default function CommentsForm({
           editorRef.current = editor;
         }}
         disabled={submitting}
+        onChange={handleEditorChange}
         placeholder={
           parentCommentId ? "Write a reply..." : "Write a comment..."
         }
       >
         <div className="_sign-in-btn flex px-2 items-center gap-2">
+          <div className="_character-counter">
+            {charCount > 0 && (
+              <span
+                className={`text-xs ${
+                  isOverLimit
+                    ? "text-red-600 font-semibold"
+                    : isNearLimit
+                      ? "text-yellow-600"
+                      : "text-gray-500"
+                }`}
+              >
+                {charCount}/{maxCharacters}
+              </span>
+            )}
+          </div>
+
           {isSignedIn ? (
             <>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={handleCancel}
-                disabled={submitting}
-                className="px-3 py-1  rounded hover:bg-gray-300"
+                disabled={submitting || !isOnline}
+                className="px-3 py-1  rounded hover:bg-gray-300 "
               >
                 Cancel
-              </button>
+              </Button>
               <Button
                 type="submit"
-                disabled={submitting}
+                disabled={
+                  submitting || !isOnline || isOverLimit || charCount === 0
+                }
                 className="px-3 py-1 flex items-center gap-1 bg-accent text-accent-foreground rounded  disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />

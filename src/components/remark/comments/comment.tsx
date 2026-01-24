@@ -5,7 +5,8 @@ import { CommentWithUser } from "@/utils/types/convex";
 import { useMutation } from "convex/react";
 import { Edit2, Reply, Trash2 } from "lucide-react";
 import { useState } from "react";
-import UserAvatar from "../user-avatar";
+import UserAvatar from "../avatar";
+import ContentRenderer from "./content-renderer";
 
 export interface CommentProps {
   comment: CommentWithUser;
@@ -20,6 +21,14 @@ const Comment = ({ comment, currentUserId }: CommentProps) => {
   const deleteComment = useMutation(api.comments.comments.deleteComment);
 
   const isOwner = currentUserId === comment.userId;
+
+  // Debug: log the comment data to see what's being passed
+  console.log("Rendering comment:", {
+    commentId: comment._id,
+    content: comment.content,
+    contentType: typeof comment.content,
+    isOwner,
+  });
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this comment?")) return;
@@ -46,7 +55,7 @@ const Comment = ({ comment, currentUserId }: CommentProps) => {
               </span>
               {comment.updatedAt && <span className=" text-xs">(edited)</span>}
             </div>
-            <div className="_content">{comment.content}</div>
+            <ContentRenderer content={comment.content} />
           </div>
 
           {!isEditing && (

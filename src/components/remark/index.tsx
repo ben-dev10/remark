@@ -1,7 +1,7 @@
 import CommentsForm from "./comments/comment-form";
-import CommentsList from "./comments/comments-list";
+import CommentsList from "./comments/comment-list";
 
-export default function CommentsWithAuth() {
+export default function CommentsSection() {
   const postId = "test-post-1";
   return (
     <div>

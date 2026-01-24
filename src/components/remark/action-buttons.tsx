@@ -1,14 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { SignInButton } from "@clerk/nextjs";
+import { useOnline } from "@/hooks/useOnline";
 
 export function AuthSignInButton() {
+  const isOnline = useOnline();
+
   return (
     <SignInButton mode="modal">
-      <Button className="">Sign In</Button>
+      <Button className="cursor-not-allowed" disabled={!isOnline}>
+        Sign In
+      </Button>
     </SignInButton>
   );
-}
-
-export function CommentButton() {
-  return <Button className="_comment-btn">Comment</Button>;
 }

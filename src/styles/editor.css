@@ -1,6 +1,16 @@
 .tiptap {
+  outline: none;
+
   &:first-child {
     margin-top: 0;
+  }
+
+  p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #adb5bd;
+    pointer-events: none;
+    height: 0;
   }
 
   & ul,
