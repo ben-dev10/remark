@@ -22,14 +22,6 @@ const Comment = ({ comment, currentUserId }: CommentProps) => {
 
   const isOwner = currentUserId === comment.userId;
 
-  // Debug: log the comment data to see what's being passed
-  console.log("Rendering comment:", {
-    commentId: comment._id,
-    content: comment.content,
-    contentType: typeof comment.content,
-    isOwner,
-  });
-
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 

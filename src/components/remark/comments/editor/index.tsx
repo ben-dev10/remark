@@ -35,22 +35,13 @@ export interface EditorProps {
   editorProps?: HTMLAttributes<HTMLDivElement>;
   children?: ReactNode;
   onReady?: (editor: Editor) => void;
-  // maxCharacters?: number;
 
   containerProps?: HTMLAttributes<HTMLDivElement>;
 }
 
 export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
   function CommentEditor(
-    {
-      disabled = false,
-      onChange,
-      // maxCharacters = 3000,
-      onReady,
-      containerProps,
-      children,
-      ...props
-    },
+    { disabled = false, onChange, onReady, containerProps, children, ...props },
     ref,
   ) {
     const [editor, setEditor] = useState<Editor | null>(null);
@@ -62,7 +53,6 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
       disabled,
       onChange,
       onReady,
-      // maxCharacters,
     });
 
     useLayoutEffect(() => {

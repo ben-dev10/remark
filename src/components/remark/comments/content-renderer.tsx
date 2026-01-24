@@ -11,8 +11,10 @@ import Italic from "@tiptap/extension-italic";
 import Strikethrough from "@tiptap/extension-strike";
 import Code from "@tiptap/extension-code";
 
+/*
+ * Accepts Tiptap JSON or JSON retrieved over the network from a db call.
+ */
 interface ContentRendererProps {
-  // content can be stored as a stringified TipTap JSON in the DB or as JSON
   content: JSONContent | string | null | undefined;
   className?: string;
 }
@@ -22,7 +24,6 @@ export default function ContentRenderer({
   className,
 }: ContentRendererProps) {
   const output = useMemo(() => {
-    // handle empty or invalid content
     if (!content) return "<p></p>";
 
     // If content is a string, try to parse it as JSON

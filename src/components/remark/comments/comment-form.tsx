@@ -10,8 +10,11 @@ import { toast } from "sonner";
 import { Send } from "lucide-react";
 import type { CreateComment } from "@/utils/types/convex";
 import { Button } from "@/components/ui/button";
-import { useOnline } from "@/hooks/useOnline";
+import { useOnline } from "@/hooks/use-online";
 import { validateCommentContent } from "./validators";
+import { STORAGE_KEYS } from "@/utils/lib/storage";
+import { useEditorPersistence } from "@/hooks/use-editor-persistence";
+import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
 
 const maxCharacters = 500;
 
@@ -25,12 +28,33 @@ export default function CommentsForm({
   parentCommentId,
 }: CommentFormProps) {
   const editorRef = useRef<Editor | null>(null);
-  const { isSignedIn } = useUser();
+  // const { isSignedIn } = useUser();
+  const { isSignedIn } = useOptimisticAuth();
   const [submitting, setSubmitting] = useState(false);
   const isOnline = useOnline();
   const [charCount, setCharCount] = useState(0);
 
   const createComment = useMutation(api.comments.comments.createComment);
+
+  const editorId = parentCommentId
+    ? STORAGE_KEYS.REPLY_DRAFT(parentCommentId)
+    : STORAGE_KEYS.COMMENT_DRAFT(postId);
+
+  // Setup editor persistence
+  const { clearDraft } = useEditorPersistence(editorRef.current, {
+    editorId,
+    enabled: true,
+    debounceMs: 500,
+    onRestore: () => {
+      if (editorRef.current) {
+        const text = editorRef.current.getText().trim();
+        setCharCount(text.length);
+        toast.info("Draft restored", { duration: 2000 });
+      }
+
+      toast.info("Draft restored", { duration: 2000 });
+    },
+  });
 
   async function handleSubmit() {
     const editor = editorRef.current;
@@ -57,6 +81,10 @@ export default function CommentsForm({
 
       editor.commands.clearContent();
       setCharCount(0);
+
+      // Clear the saved draft after successful submission
+      clearDraft();
+
       toast.success("Comment posted successfully!");
     } catch (error) {
       toast.error("Failed to post comment. Please try again.");
@@ -70,6 +98,8 @@ export default function CommentsForm({
     if (editorRef.current) {
       editorRef.current.commands.clearContent();
       setCharCount(0);
+
+      clearDraft();
     }
   }
 

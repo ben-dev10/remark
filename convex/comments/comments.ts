@@ -1,8 +1,6 @@
-// convex/comments.ts
 import { v } from "convex/values";
 import { query, mutation } from "../_generated/server";
 
-// Get all comments for a post
 export const getCommentsByPost = query({
   args: { postId: v.string() },
 
@@ -13,40 +11,40 @@ export const getCommentsByPost = query({
       .filter((q) => q.neq(q.field("isDeleted"), true))
       .collect();
 
-    // Enrich with user data
     const commentsWithUsers = await Promise.all(
       comments.map(async (comment) => {
         const user = await ctx.db.get(comment.userId);
         return {
           ...comment,
-          user: user ? {
-            username: user.username,
-            avatarUrl: user.avatarUrl,
-          } : null,
+          user: user
+            ? {
+                username: user.username,
+                avatarUrl: user.avatarUrl,
+              }
+            : null,
         };
-      })
+      }),
     );
 
     return commentsWithUsers;
   },
 });
 
-// Create a new comment
 export const createComment = mutation({
   args: {
     postId: v.string(),
     content: v.string(),
     parentCommentId: v.optional(v.id("comments")),
   },
-  
+
   handler: async (ctx, args) => {
-    // Get the current user (we'll set up auth next)
+    // get the current user
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
 
-    // Get or create user
+    // get or create user
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
@@ -55,6 +53,23 @@ export const createComment = mutation({
     if (!user) {
       throw new Error("User not found");
     }
+
+    //_TODO: implement text-limiter
+    // function extractText(node): string {
+    //   if (!node) return "";
+    //   if (node.type === "text") return node.text || "";
+    //   if (node.content) {
+    //     return node.content.map(extractText).join("");
+    //   }
+    //   return "";
+    // }
+
+    // const text = JSON.parse(args.content);
+    // const textLength = extractText(text).trim().length;
+
+    // if (textLength > 3000) {
+    //   throw new Error("Comment too long");
+    // }
 
     const commentId = await ctx.db.insert("comments", {
       postId: args.postId,
@@ -68,7 +83,6 @@ export const createComment = mutation({
   },
 });
 
-// Update a comment
 export const updateComment = mutation({
   args: {
     commentId: v.id("comments"),
@@ -102,7 +116,6 @@ export const updateComment = mutation({
   },
 });
 
-// Delete a comment (soft delete)
 export const deleteComment = mutation({
   args: { commentId: v.id("comments") },
 

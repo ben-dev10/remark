@@ -53,7 +53,8 @@
   }
 
   & code {
-    background-color: var(--purple-light);
+    background-color: var(--secondary);
+    border: 1px solid var(--border);
     border-radius: 0.4rem;
     color: var(--black);
     font-size: 0.85rem;
@@ -61,9 +62,9 @@
   }
 
   & pre {
-    background: var(--black);
+    background: var(--color-black);
     border-radius: 0.5rem;
-    color: var(--white);
+    color: var(--color-white);
     font-family: "JetBrainsMono", monospace;
     margin: 1.5rem 0;
     padding: 0.75rem 1rem;
@@ -77,14 +78,14 @@
   }
 
   & blockquote {
-    border-left: 3px solid var(--gray-3);
+    border-left: 3px solid var(--color-neutral-200);
     margin: 1.5rem 0;
     padding-left: 1rem;
   }
 
   & hr {
     border: none;
-    border-top: 1px solid var(--gray-2);
+    border-top: 1px solid var(--color-neutral-500);
     margin: 2rem 0;
   }
 }
