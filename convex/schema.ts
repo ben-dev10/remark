@@ -24,7 +24,7 @@ export default defineSchema({
     .index("by_userId", ["userId"])
     .index("by_parentCommentId", ["parentCommentId"]),
 
-  // Optional: reactions/likes
+  // reactions/likes
   reactions: defineTable({
     commentId: v.id("comments"),
     userId: v.id("users"),

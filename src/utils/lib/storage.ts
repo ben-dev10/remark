@@ -225,6 +225,8 @@ class StorageManager {
    * Get cached auth state
    */
   getCachedAuthState(): boolean | null {
+    if (typeof window === "undefined") return null;
+
     try {
       const cached = localStorage.getItem(STORAGE_KEYS.AUTH_STATE);
       if (!cached) return null;

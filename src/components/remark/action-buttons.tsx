@@ -7,7 +7,7 @@ export function AuthSignInButton() {
 
   return (
     <SignInButton mode="modal">
-      <Button className="cursor-not-allowed" disabled={!isOnline}>
+      <Button className="" disabled={!isOnline}>
         Sign In
       </Button>
     </SignInButton>

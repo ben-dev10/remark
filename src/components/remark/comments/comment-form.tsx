@@ -2,7 +2,6 @@
 import { useRef, useState } from "react";
 import { AuthSignInButton } from "../action-buttons";
 import { CommentEditor } from "./editor";
-import { useUser } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import type { Editor } from "@tiptap/react";
@@ -15,54 +14,60 @@ import { validateCommentContent } from "./validators";
 import { STORAGE_KEYS } from "@/utils/lib/storage";
 import { useEditorPersistence } from "@/hooks/use-editor-persistence";
 import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
-
-const maxCharacters = 500;
+import { COMMENTS_CONFIG } from "./config/comments";
 
 interface CommentFormProps {
   postId: CreateComment["postId"];
   parentCommentId?: CreateComment["parentCommentId"];
+  isLocked: boolean;
 }
 
 export default function CommentsForm({
   postId,
   parentCommentId,
+  isLocked,
 }: CommentFormProps) {
   const editorRef = useRef<Editor | null>(null);
-  // const { isSignedIn } = useUser();
-  const { isSignedIn } = useOptimisticAuth();
+  const { isSignedIn, isLoaded, isOptimistic } = useOptimisticAuth();
   const [submitting, setSubmitting] = useState(false);
-  const isOnline = useOnline();
   const [charCount, setCharCount] = useState(0);
+  const isOnline = useOnline();
 
-  const createComment = useMutation(api.comments.comments.createComment);
+  const createComment = useMutation(
+    api.comments.comments.createCommentWithLock,
+  );
 
   const editorId = parentCommentId
     ? STORAGE_KEYS.REPLY_DRAFT(parentCommentId)
     : STORAGE_KEYS.COMMENT_DRAFT(postId);
 
-  // Setup editor persistence
   const { clearDraft } = useEditorPersistence(editorRef.current, {
     editorId,
     enabled: true,
     debounceMs: 500,
-    onRestore: () => {
-      if (editorRef.current) {
-        const text = editorRef.current.getText().trim();
-        setCharCount(text.length);
-        toast.info("Draft restored", { duration: 2000 });
-      }
-
-      toast.info("Draft restored", { duration: 2000 });
-    },
   });
 
   async function handleSubmit() {
     const editor = editorRef.current;
-
-    // cancel submit if content is empty
     if (!editor || editor.isEmpty) return;
-    // Validate content
-    const validation = validateCommentContent(editor, maxCharacters);
+
+    // If Clerk hasn't loaded yet, wait for it
+    if (!isLoaded) {
+      toast.error("Please wait while we verify your session...");
+      return;
+    }
+
+    // Double-check auth state after Clerk loads
+    if (!isSignedIn) {
+      toast.error("You must be signed in to comment");
+      return;
+    }
+
+    const validation = validateCommentContent(
+      editor,
+      COMMENTS_CONFIG.MAX_CHARACTERS,
+    );
+
     if (!validation.isValid) {
       toast.error(validation.error);
       return;
@@ -81,8 +86,6 @@ export default function CommentsForm({
 
       editor.commands.clearContent();
       setCharCount(0);
-
-      // Clear the saved draft after successful submission
       clearDraft();
 
       toast.success("Comment posted successfully!");
@@ -108,8 +111,8 @@ export default function CommentsForm({
     setCharCount(text.length);
   }
 
-  const isOverLimit = charCount > maxCharacters;
-  const isNearLimit = charCount > maxCharacters * 0.8;
+  const isOverLimit = charCount > COMMENTS_CONFIG.MAX_CHARACTERS;
+  const isNearLimit = charCount > COMMENTS_CONFIG.MAX_CHARACTERS * 0.8;
 
   return (
     <form
@@ -117,67 +120,78 @@ export default function CommentsForm({
         e.preventDefault();
         handleSubmit();
       }}
-      className="_comments-post dark:bg-[#141414] bg-neutral-200"
+      className="_comments-post bg-secondary rounded-lg"
     >
       <CommentEditor
         onReady={(editor) => {
           editorRef.current = editor;
         }}
-        disabled={submitting}
         onChange={handleEditorChange}
+        disabled={submitting}
         placeholder={
           parentCommentId ? "Write a reply..." : "Write a comment..."
         }
+        containerProps={{ className: "rounded-lg" }}
       >
-        <div className="_sign-in-btn flex px-2 items-center gap-2">
-          <div className="_character-counter">
-            {charCount > 0 && (
-              <span
-                className={`text-xs ${
-                  isOverLimit
-                    ? "text-red-600 font-semibold"
-                    : isNearLimit
-                      ? "text-yellow-600"
-                      : "text-gray-500"
-                }`}
-              >
-                {charCount}/{maxCharacters}
-              </span>
+        {!isLocked ? (
+          <div className="_sign-in-btn flex items-center gap-1">
+            {isSignedIn ? (
+              <>
+                {/* Character counter */}
+                {charCount > 0 && (
+                  <span
+                    className={`text-xs ${
+                      isOverLimit
+                        ? "text-red-600 font-semibold"
+                        : isNearLimit
+                          ? "text-yellow-600"
+                          : "text-gray-500"
+                    }`}
+                  >
+                    {charCount}/{COMMENTS_CONFIG.MAX_CHARACTERS}
+                  </span>
+                )}
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleCancel}
+                  disabled={submitting || !isOnline || isOptimistic}
+                  className="px-3 py-1 rounded-md"
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  type="submit"
+                  disabled={
+                    submitting ||
+                    !isOnline ||
+                    isOverLimit ||
+                    charCount === 0 ||
+                    isOptimistic
+                  }
+                  className="px-3 py-1 flex items-center gap-1 rounded-md disabled:opacity-50"
+                >
+                  <Send className="w-4 h-4" />
+                  {submitting
+                    ? "Posting..."
+                    : isOptimistic
+                      ? "Loading..."
+                      : parentCommentId
+                        ? "Reply"
+                        : "Comment"}
+                </Button>
+              </>
+            ) : (
+              <div className="">
+                <AuthSignInButton />
+              </div>
             )}
           </div>
-
-          {isSignedIn ? (
-            <>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={handleCancel}
-                disabled={submitting || !isOnline}
-                className="px-3 py-1  rounded hover:bg-gray-300 "
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={
-                  submitting || !isOnline || isOverLimit || charCount === 0
-                }
-                className="px-3 py-1 flex items-center gap-1 bg-accent text-accent-foreground rounded  disabled:opacity-50"
-              >
-                <Send className="w-4 h-4" />
-                {submitting
-                  ? "Posting…"
-                  : parentCommentId
-                    ? "Reply"
-                    : "Comment"}
-              </Button>
-            </>
-          ) : (
-            <div className="space-x-4">
-              <AuthSignInButton />
-            </div>
-          )}
-        </div>
+        ) : (
+          ""
+        )}
       </CommentEditor>
     </form>
   );

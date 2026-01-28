@@ -12,10 +12,10 @@ export default function UserAvatar(user: AvatarProps) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={user.user?.avatarUrl}
-        alt={`${user?.user?.username}'s profile image`}
+        alt={`${user?.user?.username || "Unknown User"}'s profile image`}
         className="size-5 rounded-full"
       />
-      <p>{user?.user?.username}</p>
+      <p>{user?.user?.username || "Unknown User"}</p>
     </div>
   );
 }

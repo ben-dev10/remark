@@ -13,9 +13,9 @@ export type CreateComment = {
   parentCommentId?: Id<"comments">;
 };
 
-// commonly used IDs
 export type CommentUser = CommentWithUser["user"];
 export type CommentUserNonNull = NonNullable<CommentWithUser["user"]>;
+export type ParentCommentId = Id<"comments"> | undefined;
 export type CommentId = Id<"comments">;
 export type UserId = Id<"users">;
 export type PostId = string;

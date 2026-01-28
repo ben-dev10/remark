@@ -66,7 +66,7 @@ export default function ContentRenderer({
           // only allow http/https links
           validate: (url) => /^https?:\/\//i.test(url),
           HTMLAttributes: {
-            class: "text-blue-600 hover:underline",
+            class: "text-blue-600 dark:text-blue-400 hover:underline",
             rel: "noopener noreferrer nofollow", // prevent tab-nabbing
             target: "_blank",
           },
@@ -74,7 +74,7 @@ export default function ContentRenderer({
       ]);
     } catch (error) {
       console.error("Error rendering content:", error, parsed);
-      return "<p>Error</p>";
+      return "<p></p>"; // _TODO: make a better skeleton
     }
   }, [content]);
 

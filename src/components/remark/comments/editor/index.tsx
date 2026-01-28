@@ -119,7 +119,10 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
         {...containerProps}
         ref={ref}
         aria-disabled={disabled}
-        className="_comment-editor border-b-0 p-2 px-3 border"
+        className={cn(
+          "_comment-editor border-b-0 p-3 pb-2 border",
+          containerProps?.className,
+        )}
       >
         <EditorContent
           editor={editor}
@@ -127,7 +130,7 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
           className="tiptap outline-none! rounded-md"
         />
 
-        <div className="_btns flex mt-2 justify-between">
+        <div className="_btns flex mt-2 items-center justify-between">
           <div className="_markup-btns py-2 flex">
             <MarkButton
               editor={editor}
@@ -165,7 +168,7 @@ export const toggleVariants = cva(
   {
     variants: {
       active: {
-        true: "bg-secondary text-red-500",
+        true: "dark:bg-primary/30 bg-primary text-white dark:text-white",
       },
     },
     defaultVariants: {

@@ -20,6 +20,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["./**/*", "../archive/users2.ts"],
+  "include": ["./**/*"],
   "exclude": ["./_generated"]
 }
