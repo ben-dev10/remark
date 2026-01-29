@@ -137,10 +137,9 @@ export default function CommentsForm({
           <div className="_sign-in-btn flex items-center gap-1">
             {isSignedIn ? (
               <>
-                {/* Character counter */}
                 {charCount > 0 && (
                   <span
-                    className={`text-xs ${
+                    className={`_character-counter text-xs ${
                       isOverLimit
                         ? "text-red-600 font-semibold"
                         : isNearLimit
@@ -176,11 +175,9 @@ export default function CommentsForm({
                   <Send className="w-4 h-4" />
                   {submitting
                     ? "Posting..."
-                    : isOptimistic
-                      ? "Loading..."
-                      : parentCommentId
-                        ? "Reply"
-                        : "Comment"}
+                    : parentCommentId
+                      ? "Reply"
+                      : "Comment"}
                 </Button>
               </>
             ) : (

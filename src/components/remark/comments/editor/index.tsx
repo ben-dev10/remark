@@ -70,7 +70,7 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
               return /^https?:\/\//.test(url);
             },
             HTMLAttributes: {
-              class: "text-blue-500 hover:underline",
+              class: "text-blue-500 dark:text-blue-400 hover:underline",
             },
           }),
           Placeholder.configure({
@@ -108,8 +108,10 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
     if (!editor) {
       // placeholder render until Tiptap's render of the editor is complete
       return (
-        <div {...containerProps} className="_comment-editor px-2 p-1.5 h-19">
-          <p {...props.editorProps}>{props.placeholder}</p>
+        <div {...containerProps} className="_comment-editor p-3 h-25">
+          <p {...props.editorProps} className="text-muted-foreground">
+            {props.placeholder}
+          </p>
         </div>
       );
     }

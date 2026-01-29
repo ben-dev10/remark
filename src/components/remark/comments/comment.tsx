@@ -84,10 +84,10 @@ const Comment = ({
     return (
       <div className="space-y-3">
         <div className="flex gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-200" />
+          <div className="w-10 h-10 rounded-full bg-muted" />
           <div className="flex-1 min-w-0">
-            <div className="bg-gray-100 rounded-lg p-3">
-              <p className="text-gray-500 italic text-sm">
+            <div className=" rounded-lg p-3">
+              <p className="text-muted-foreground italic text-sm">
                 This comment has been deleted
               </p>
             </div>
@@ -100,9 +100,8 @@ const Comment = ({
   return (
     <div className="space-y-3">
       <div className="flex-1 min-w-0">
-        {/* Comment Content or Edit Form */}
         {isEditing ? (
-          <div className="space-y-2 relative">
+          <div className="_edit-form space-y-2 relative">
             <EditForm
               commentId={comment._id}
               initialContent={comment.content}
@@ -169,7 +168,6 @@ const Comment = ({
                 </button>
               )}
 
-              {/* edit & delete Buttons - only show to owner */}
               {isOwner && !isLocked && (
                 <>
                   <button
@@ -189,9 +187,8 @@ const Comment = ({
                 </>
               )}
 
-              {/* Show locked indicator if actions are disabled */}
               {isLocked && isOwner && (
-                <span className="text-xs text-gray-400 italic">
+                <span className="text-xs text-muted-foreground italic">
                   (Discussion locked)
                 </span>
               )}

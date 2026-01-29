@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import type { Editor } from "@tiptap/react";
 import { toast } from "sonner";
-import { Send, X } from "lucide-react";
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOnline } from "@/hooks/use-online";
 import { useEditorPersistence } from "@/hooks/use-editor-persistence";
@@ -13,6 +13,8 @@ import { STORAGE_KEYS } from "@/utils/lib/storage";
 import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
 import { ParentCommentId } from "@/utils/types/convex";
 import { COMMENTS_CONFIG } from "./config/comments";
+import { validateCommentContent } from "./validators";
+import { DiscardChangesDialog } from "./ui";
 
 interface ReplyFormProps {
   postId: string;
@@ -21,35 +23,6 @@ interface ReplyFormProps {
   onSuccess?: () => void;
   maxCharacters?: number;
   replyingToUsername?: string;
-}
-
-// Validation function (same as main form)
-function validateCommentContent(
-  editor: Editor,
-  maxCharacters: number,
-): {
-  isValid: boolean;
-  error?: string;
-} {
-  if (!editor || editor.isEmpty) {
-    return { isValid: false, error: "Reply cannot be empty" };
-  }
-
-  const text = editor.getText().trim();
-  const charCount = text.length;
-
-  if (charCount === 0) {
-    return { isValid: false, error: "Reply cannot be empty" };
-  }
-
-  if (charCount > maxCharacters) {
-    return {
-      isValid: false,
-      error: `Reply is too long. Maximum ${maxCharacters} characters allowed (currently ${charCount})`,
-    };
-  }
-
-  return { isValid: true };
 }
 
 export default function ReplyForm({
@@ -64,10 +37,10 @@ export default function ReplyForm({
   const [submitting, setSubmitting] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const isOnline = useOnline();
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
 
   const createComment = useMutation(api.comments.comments.createComment);
 
-  // Setup editor persistence with unique ID for this reply
   const { clearDraft } = useEditorPersistence(editorRef.current, {
     editorId: STORAGE_KEYS.REPLY_DRAFT(
       parentCommentId as NonNullable<typeof parentCommentId>,
@@ -78,7 +51,6 @@ export default function ReplyForm({
       if (editorRef.current) {
         const text = editorRef.current.getText().trim();
         setCharCount(text.length);
-        toast.info("Reply draft restored", { duration: 2000 });
       }
     },
   });
@@ -87,19 +59,16 @@ export default function ReplyForm({
     const editor = editorRef.current;
     if (!editor) return;
 
-    // If Clerk hasn't loaded yet, wait for it
     if (!isLoaded) {
       toast.error("Please wait while we verify your session...");
       return;
     }
 
-    // Double-check auth state after Clerk loads
     if (!isSignedIn) {
       toast.error("You must be signed in to reply");
       return;
     }
 
-    // Validate content
     const validation = validateCommentContent(
       editor,
       COMMENTS_CONFIG.MAX_CHARACTERS,
@@ -118,18 +87,15 @@ export default function ReplyForm({
       await createComment({
         postId,
         content,
-        parentCommentId, // This makes it a reply!
+        parentCommentId,
       });
 
       editor.commands.clearContent();
       setCharCount(0);
 
-      // Clear the saved draft after successful submission
       clearDraft();
-
       toast.success("Reply posted successfully!");
 
-      // Call success callback and close form
       onSuccess?.();
       onCancel();
     } catch (error) {
@@ -142,19 +108,24 @@ export default function ReplyForm({
 
   function handleCancel() {
     if (editorRef.current && !editorRef.current.isEmpty) {
-      const confirmDiscard = window.confirm(
-        "You have unsaved changes. Discard reply?",
-      );
-      if (!confirmDiscard) return;
+      setShowDiscardDialog(true);
+      return;
     }
 
     editorRef.current?.commands.clearContent();
     setCharCount(0);
 
-    // Clear the saved draft when canceling
     clearDraft();
-
     onCancel();
+  }
+
+  function handleDiscardConfirm() {
+    editorRef.current?.commands.clearContent();
+    setCharCount(0);
+
+    clearDraft();
+    onCancel();
+    setShowDiscardDialog(false);
   }
 
   function handleEditorChange(editor: Editor) {
@@ -171,7 +142,7 @@ export default function ReplyForm({
         e.preventDefault();
         handleSubmit();
       }}
-      className="_reply-form mt-3  pl-4"
+      className="_reply-form mt-3 pl-4"
     >
       {replyingToUsername && (
         <p className="text-sm text-muted-foreground mb-2">
@@ -222,13 +193,19 @@ export default function ReplyForm({
               charCount === 0 ||
               isOptimistic
             }
-            className="px-3 py-1 flex items-center gap-1 rounded-md disabled:opacity-50 "
+            className="px-3 py-1 flex items-center gap-1 rounded-md disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
             {submitting ? "Posting…" : isOptimistic ? "Loading..." : "Reply"}
           </Button>
         </div>
       </CommentEditor>
+
+      <DiscardChangesDialog
+        open={showDiscardDialog}
+        onOpenChange={setShowDiscardDialog}
+        onConfirm={handleDiscardConfirm}
+      />
     </form>
   );
 }

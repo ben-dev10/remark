@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import type { Editor, JSONContent } from "@tiptap/react";
 import { toast } from "sonner";
-import { Save, X } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOnline } from "@/hooks/use-online";
 import { useEditorPersistence } from "@/hooks/use-editor-persistence";
@@ -14,10 +14,11 @@ import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
 import { validateCommentContent } from "./validators";
 import { CommentId } from "@/utils/types/convex";
 import { COMMENTS_CONFIG } from "./config/comments";
+import { DiscardChangesDialog } from "./ui";
 
 interface EditFormProps {
   commentId: CommentId;
-  initialContent: string; // JSON string from database
+  initialContent: string;
   onCancel: () => void;
   onSuccess?: () => void;
   maxCharacters?: number;
@@ -35,6 +36,7 @@ export default function EditForm({
   const [charCount, setCharCount] = useState(0);
   const [hasChanges, setHasChanges] = useState(false);
   const isOnline = useOnline();
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
 
   const updateComment = useMutation(api.comments.comments.updateComment);
 
@@ -51,14 +53,6 @@ export default function EditForm({
     editorId: STORAGE_KEYS.EDIT_DRAFT(commentId),
     enabled: true,
     debounceMs: 500,
-    onRestore: () => {
-      if (editorRef.current) {
-        const text = editorRef.current.getText().trim();
-        setCharCount(text.length);
-        setHasChanges(true);
-        toast.info("Edit draft restored", { duration: 2000 });
-      }
-    },
   });
 
   async function handleSubmit() {
@@ -70,7 +64,6 @@ export default function EditForm({
       return;
     }
 
-    // double-check auth state after Clerk loads
     if (!isSignedIn) {
       toast.error("You must be signed in to edit");
       return;
@@ -100,7 +93,6 @@ export default function EditForm({
 
       toast.success("Comment updated successfully!");
 
-      // Call success callback and close form
       onSuccess?.();
       onCancel();
     } catch (error) {
@@ -113,14 +105,18 @@ export default function EditForm({
 
   function handleCancel() {
     if (hasChanges || hasDraft()) {
-      const confirmDiscard = window.confirm(
-        "You have unsaved changes. Discard them?",
-      );
-      if (!confirmDiscard) return;
+      setShowDiscardDialog(true);
+      return;
     }
 
     clearDraft();
     onCancel();
+  }
+
+  function handleDiscardConfirm() {
+    clearDraft();
+    onCancel();
+    setShowDiscardDialog(false);
   }
 
   function handleEditorChange(editor: Editor) {
@@ -195,13 +191,19 @@ export default function EditForm({
               isOptimistic ||
               !hasChanges
             }
-            className="px-3 py-1 flex items-center gap-1 rounded-md disabled:opacity-50 "
+            className="px-3 py-1 flex items-center gap-1 rounded-md disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {submitting ? "Saving…" : isOptimistic ? "Loading..." : "Save"}
           </Button>
         </div>
       </CommentEditor>
+
+      <DiscardChangesDialog
+        open={showDiscardDialog}
+        onOpenChange={setShowDiscardDialog}
+        onConfirm={handleDiscardConfirm}
+      />
     </form>
   );
 }

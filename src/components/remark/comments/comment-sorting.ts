@@ -6,9 +6,6 @@ export type SortOption =
   | "most-replies"
   | "recently-updated";
 
-/**
- * Sort comments based on selected option
- */
 export function sortComments(
   comments: CommentWithUser[],
   sortBy: SortOption,
@@ -110,10 +107,8 @@ export function sortReplies(
   sortBy: SortOption,
 ): CommentWithUser[] {
   // For replies, we typically want them chronological regardless of main sort
-  // But you can customize this behavior
-
   if (sortBy === "oldest" || sortBy === "recently-updated") {
-    // Keep replies in chronological order (oldest first feels more natural)
+    // Keep replies in chronological order
     return [...replies].sort((a, b) => a.createdAt - b.createdAt);
   }
 

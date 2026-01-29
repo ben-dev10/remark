@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 /**
  * Enhanced hook to detect online/offline status
- * More reliable than just navigator.onLine
  */
 export function useOnline() {
   const [isOnline, setIsOnline] = useState(() => {
@@ -66,34 +65,3 @@ export function useOnline() {
 
   return isOnline;
 }
-
-/**
- * Alternative: Manual refresh button approach
- * Sometimes more reliable in development
- */
-// export function useOnlineWithManualRefresh() {
-//   const [isOnline, setIsOnline] = useState(() => navigator.onLine);
-//   const [lastCheck, setLastCheck] = useState(Date.now());
-
-//   useEffect(() => {
-//     const handleOnline = () => setIsOnline(true);
-//     const handleOffline = () => setIsOnline(false);
-
-//     window.addEventListener("online", handleOnline);
-//     window.addEventListener("offline", handleOffline);
-
-//     return () => {
-//       window.removeEventListener("online", handleOnline);
-//       window.removeEventListener("offline", handleOffline);
-//     };
-//   }, []);
-
-//   const forceRefresh = () => {
-//     const currentStatus = navigator.onLine;
-//     setIsOnline(currentStatus);
-//     setLastCheck(Date.now());
-//     console.log(`Network status refreshed: ${currentStatus ? "Online" : "Offline"}`);
-//   };
-
-//   return { isOnline, forceRefresh, lastCheck };
-// }

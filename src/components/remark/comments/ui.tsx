@@ -105,7 +105,6 @@ export function DeleteCommentDialog({
           <AlertDialogDescription>
             Are you sure you want to delete this comment? This action cannot be
             undone.
-            {/* Optional: Add info about replies */}
             <span className="block mt-2 text-xs text-gray-500">
               Note: Replies to this comment will remain visible.
             </span>
@@ -119,9 +118,46 @@ export function DeleteCommentDialog({
               onConfirm();
             }}
             disabled={isDeleting}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-red-600 hover:bg-red-700 dark:text-white"
           >
             {isDeleting ? "Deleting..." : "Delete"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+interface DiscardChangesProp {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+}
+
+export function DiscardChangesDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+}: DiscardChangesProp) {
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Discard Changes</AlertDialogTitle>
+          <AlertDialogDescription>
+            You have unsaved changes. Discard them?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
+            className="bg-red-600 hover:bg-red-700 dark:text-white"
+          >
+            Discard
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

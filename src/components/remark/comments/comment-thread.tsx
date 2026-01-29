@@ -54,7 +54,6 @@ export function CommentThread({
 
   return (
     <div className="space-y-4">
-      {/* Render the comment */}
       <Comment
         comment={comment}
         postId={postId}

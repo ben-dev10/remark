@@ -168,7 +168,7 @@ export default function CommentsList({ postId }: CommentListProps) {
   // if (!isOnline && cachedComments) {
   //   return (
   //     <div className="pt-5">
-  //       <div className="sticky top-2 z-10 mb-4 flex items-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm rounded-lg">
+  //       <div className="top-2 z-10 mb-4 flex items-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm rounded-lg">
   //         <WifiOff className="w-4 h-4" />
   //         <span className="flex-1">
   //           {cachedComments
@@ -240,7 +240,7 @@ export default function CommentsList({ postId }: CommentListProps) {
   // CASE 4: No comments
   if (comments === null || (Array.isArray(comments) && comments.length === 0)) {
     return (
-      <div className="_comments-list min-h-30 border p-5 relative">
+      <div className="_comments-list min-h-30 p-5 relative">
         {showOfflineBadge && (
           <div className="absolute top-2 right-2 flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
             <WifiOff className="w-3 h-3" />
@@ -249,7 +249,7 @@ export default function CommentsList({ postId }: CommentListProps) {
         )}
 
         <div className="flex items-center justify-center py-8">
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             No comments yet. Be the first to comment!
           </p>
         </div>
@@ -272,7 +272,7 @@ export default function CommentsList({ postId }: CommentListProps) {
   return (
     <div className="_comments-list min-h-30 mt-5 p-5">
       {!isOnline && (
-        <div className="sticky ml-auto mb-6 top-2 z-10 flex max-w-max items-center gap-2 px-4 py-2 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400 text-sm rounded-lg">
+        <div className="ml-auto mb-6 top-2 z-10 flex max-w-max items-center gap-2 px-4 py-2 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400 text-sm rounded-lg">
           <WifiOff className="w-4 h-4" />
           <span className="flex-1">
             {cachedComments
@@ -367,7 +367,7 @@ export default function CommentsList({ postId }: CommentListProps) {
       )}
 
       {!hasMore && displayComments.length > 0 && (
-        <div className="_end-of-comments mt-10 text-center text-sm text-gray-500">
+        <div className="_end-of-comments mt-10 text-center text-sm text-muted-foreground">
           <p>End of comments</p>
         </div>
       )}
