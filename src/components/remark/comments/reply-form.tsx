@@ -158,6 +158,9 @@ export default function ReplyForm({
         onChange={handleEditorChange}
         disabled={submitting}
         placeholder="Write a reply..."
+        containerProps={{
+          className: "rounded-lg",
+        }}
       >
         <div className="flex px-2 items-center gap-2">
           {charCount > 0 && (

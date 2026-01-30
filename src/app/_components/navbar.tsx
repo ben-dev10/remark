@@ -2,6 +2,14 @@ import Section from "@/components/_ui/section";
 import { ThemeToggle } from "@/components/_ui/theme-toggles";
 import RemarkLogo from "@/icons/remark-logo";
 import { UserButton } from "@clerk/nextjs";
+import Link from "next/link";
+
+const links = [
+  {
+    name: "Blog",
+    url: "/blog",
+  },
+];
 
 export default function Navbar() {
   const css = `transition-[color,background-color,border-color,text-decoration-color,fill,stroke,box-shadow,background] 
@@ -9,20 +17,36 @@ export default function Navbar() {
   [box-shadow:0_0_0_0.5px_rgba(255,255,255,0.9)_inset,0_0_0_0.5px_rgba(19,19,22,0.15),0_2px_3px_0_rgba(0,0,0,0.04),0_4px_6px_0_rgba(34,42,53,0.04),0_1px_1px_0_rgba(0,0,0,0.05)] 
   dark:bg-[rgba(19,19,22,0.90)] dark:[box-shadow:0_0_0_0.5px_rgba(247,247,248,0.15)_inset,0_0_0_0.5px_rgba(19,19,22,0.8),0_2px_3px_0_rgba(0,0,0,0.16),0_4px_6px_0_rgba(34,42,53,0.16),0_1px_1px_0_rgba(0,0,0,0.16)] 
     `;
+
   return (
-    <Section.RootElement className="_navbar p-2">
+    <Section.RootElement className="_navbar sticky top-0 z-10 bg-linear-to-b from-primary/1 to-transparent backdrop-blur-[20px] p-2">
       <Section.Container
         container="7xl"
-        className={`border ${css} rounded-lg p-2 pr-3`}
+        className={`border ${css} backdrop-blur-[20px] rounded-lg p-2 pr-3`}
       >
         <div className="flex justify-between">
-          <div className="_logo flex gap-0.5 items-center">
+          <Link href="/" className="_logo flex gap-0.5 items-center">
             <RemarkLogo className="-mb-2 size-7" />
             <p className="font-bold text-[1.2rem]"> Remark</p>
-          </div>
-          <div className="flex gap-2">
-            <ThemeToggle />
-            <UserButton />
+          </Link>
+
+          <div className="_left-half flex items-center gap-4">
+            <nav className="_links">
+              {links.map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.url}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="_utilities flex items-center gap-3">
+              <ThemeToggle />
+              <UserButton />
+            </div>
           </div>
         </div>
       </Section.Container>

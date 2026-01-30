@@ -1,0 +1,146 @@
+---
+title: Remark
+description: "Explore the advanced features that make this comment system stand out - from real-time sync to offline support and smart pagination."
+author: "@nard"
+date: 2026-01-15
+---
+
+Building a modern comment system requires more than just storing text in a database. Our implementation showcases several cutting-edge features that deliver an exceptional user experience.
+
+<div className="_spacer mt-10" />
+## Real-Time Synchronization
+
+One of the standout features is **real-time updates** powered by Convex. When someone posts a comment, all users viewing the page see it instantly, no refresh needed.
+
+```typescript
+// Convex automatically handles real-time sync
+const comments = useQuery(api.comments.getComments, { postId });
+```
+
+<div className="_spacer mt-8" />
+
+Traditional comment systems require polling or manual refreshes. With real-time sync: conversations flow naturally, See replies as they happen, your comment appears immediately.
+Real-time updates work even when multiple users are commenting simultaneously. Convex handles conflict resolution automatically!
+
+<div className="_spacer mt-15" />
+## State Persistence
+
+Network issues shouldn't break your user experience. Our system gracefully handles offline scenarios:
+Almost every action is persisted to local-storage, closely mimicking native apps - from editor inputs to select preferences.
+
+<div className="_spacer mt-6" />
+
+```typescript
+// Comments are cached locally
+const cachedComments = storageManager.getCachedComments(postId);
+
+// Display cached data when offline
+const comments = isOnline ? liveComments : cachedComments;
+
+// Auto-saves every 500ms
+useEditorPersistence(editor, {
+  editorId: `comment_draft_${postId}`,
+  debounceMs: 500,
+});
+```
+
+<div className="_spacer mt-15" />
+
+## Rich Text Editing with <span className="font-mono bg-secondary -mt-1 border rounded-md p-1 text-[1.2rem]">TipTap</span>
+
+We use TipTap for a powerful editing experience: it enables rich text-editing from basic formatting to links and @mentions (mentions will be supported in a later update, stay tuned)
+
+```typescript
+import { Editor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+
+const editor = new Editor({
+  extensions: [
+    StarterKit,
+    Link.configure({
+      validate: (url) => /^https?:\/\//.test(url),
+    }),
+  ],
+});
+```
+
+<div className="_spacer mt-15" />
+## Pagination and Limits
+
+Large discussions don't slow down the page, so a batch load strategy was adopted, initial requests are capped at 40 top-level comments + all replies, a load more button appears to load the next 40 comments and so on.
+
+```typescript
+const COMMENTS_CONFIG = {
+  PAGE_SIZE: 40,
+  MAX_COMMENTS_PER_POST: 1200,
+  ARCHIVE_DISPLAY_THRESHOLD: 500,
+};
+```
+
+<div className="_spacer mt-8" />
+
+##### Auto-Lock System
+
+When at 90% capacity per conversation (1080 comments), a warning appears. And at 1000 individual comments per conversation, the conversation is automatically locked. At which point it is put into a read-only mode.
+This is to manage database size and also to prevent infinite requests.
+
+<Callout type="error">
+  When in read-only mode all interactive elements (reply, edit, reactions) are
+  also disabled to protect system resources.
+</Callout>
+
+<div className="_spacer mt-15" />
+## Security & Validation
+
+Every interaction is protected: content is stored as JSON (to mitigate xss attacks), links validated to block `javascript:` URLs. TipTap also sanitizes output automatically.
+
+<div className="_spacer mt-8" />
+**Input Validations:**
+
+```typescript
+// Character limit enforcement
+if (textLength > 3000) {
+  throw new Error("Comment too long");
+}
+
+// Link sanitization
+validate: (url) => /^https?:\/\//.test(url);
+```
+
+<div className="_spacer mt-8" />
+
+**Performance Optimizations**
+
+Indexed queries - Fast lookups by `postId`,`userId`, **batch loading**: Replies loaded with parents, **optimistic UI**: Instant feedback before server confirms
+
+```typescript
+// Single query gets comment + user data + replies
+const commentsWithUsers = await Promise.all(
+  comments.map(async (comment) => ({
+    ...comment,
+    user: await ctx.db.get(comment.userId),
+  })),
+);
+
+// Without index: O(n) - scans entire table
+// With index: O(log n) - instant lookup
+
+await ctx.db
+  .query("comments")
+  .withIndex("by_postId", (q) => q.eq("postId", postId))
+  .collect();
+```
+
+<div className="_spacer mt-15" />
+## What's Next?
+
+This is just the beginning! Future enhancements could include:
+
+- 🔍 **Search** - Find comments by keyword
+- 📊 **Analytics** - Track engagement metrics
+- 🌐 **i18n** - Multi-language support
+
+Ready to integrate this into your own project? Check out our [setup guide](/blog/remark-setup) to get started!
+
+<div className="_spacer mb-10" />

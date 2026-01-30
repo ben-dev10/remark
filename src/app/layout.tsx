@@ -7,6 +7,8 @@ import { ThemeProvider } from "@/context/theme-provider";
 import { shadcn } from "@clerk/themes";
 import { Toaster } from "sonner";
 import { berkeleyMono, ppe, sfPro } from "./_components/fonts";
+import Navbar from "./_components/navbar";
+import Footer from "./_components/footer";
 
 export const metadata: Metadata = {
   title: "Remark",
@@ -22,12 +24,14 @@ export default function RootLayout({
     <ClerkProvider appearance={{ theme: shadcn }}>
       <html lang="en">
         <body
-          className={`_ui ${ppe.variable} ${sfPro.variable} ${berkeleyMono.variable} font-sans antialiased`}
+          className={`${ppe.variable} ${sfPro.variable} _ui ${berkeleyMono.variable} font-sans antialiased`}
         >
           <ConvexClientProvider>
             <ThemeProvider>
               <RootProvider>
+                <Navbar />
                 {children}
+                <Footer />
 
                 <Toaster
                   toastOptions={{

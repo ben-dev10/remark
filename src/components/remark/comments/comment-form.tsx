@@ -51,17 +51,12 @@ export default function CommentsForm({
     const editor = editorRef.current;
     if (!editor || editor.isEmpty) return;
 
-    // If Clerk hasn't loaded yet, wait for it
     if (!isLoaded) {
       toast.error("Please wait while we verify your session...");
       return;
     }
 
-    // Double-check auth state after Clerk loads
-    if (!isSignedIn) {
-      toast.error("You must be signed in to comment");
-      return;
-    }
+    if (!isSignedIn) return;
 
     const validation = validateCommentContent(
       editor,
@@ -120,7 +115,7 @@ export default function CommentsForm({
         e.preventDefault();
         handleSubmit();
       }}
-      className="_comments-post bg-secondary rounded-lg"
+      className="_comments-post bg-secondary/60 rounded-lg"
     >
       <CommentEditor
         onReady={(editor) => {
@@ -144,7 +139,7 @@ export default function CommentsForm({
                         ? "text-red-600 font-semibold"
                         : isNearLimit
                           ? "text-yellow-600"
-                          : "text-gray-500"
+                          : "text-muted-foreground"
                     }`}
                   >
                     {charCount}/{COMMENTS_CONFIG.MAX_CHARACTERS}

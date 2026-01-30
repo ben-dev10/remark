@@ -62,9 +62,8 @@ export function CommentThread({
         isLocked={isLocked}
       />
 
-      {/* Render nested replies */}
       {hasReplies && (
-        <div className="ml-1 space-y-4 border-l-2 border-muted-foreground/20 pl-8">
+        <div className="ml-1 space-y-4 border-l border-muted-foreground/20 pl-8">
           {replies.map((reply) => (
             <CommentThread
               key={reply._id}

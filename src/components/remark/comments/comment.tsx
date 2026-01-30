@@ -122,7 +122,7 @@ const Comment = ({
           </div>
         ) : (
           <>
-            <div className="_comment-content bg-secondary dark:bg-secondary/50 rounded-lg p-3">
+            <div className="_comment-content  rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
                 <span className="font-semibold">
                   <UserAvatar user={comment.user} />

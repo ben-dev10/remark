@@ -1,0 +1,76 @@
+---
+title: Setup & Integration Guide
+description: Step-by-step guide to integrate this comment system into your Next.js application with Convex and Clerk authentication.
+author: "@nard"
+date: 2026-01-15
+---
+
+This guide walks you through integrating Remark into your Next.js application. We'll cover everything from initial setup to advanced configuration.
+
+<div className="_spacer mt-8" />
+## Prerequisites
+
+Before starting, ensure you have a local clone of the application from Github.
+
+<section id="setup-section">
+    <div className="fd-steps [&_h3]:fd-step">
+          <div className="_spacer mt-8" />
+          ### Install Dependencies
+
+          ```npm
+          npm install
+          ```
+
+          The core packages of the application
+
+          | Package         | Purpose                            |
+          | --------------- | ---------------------------------- |
+          | `convex`        | Real-time database and backend     |
+          | `@clerk/nextjs` | Authentication and user management |
+          | `@tiptap/react` | Rich text editor                   |
+          | `fumadocs`      | MDX processing (for blog)          |
+
+          <div className="_spacer mt-8" />
+          ### Initialize Clerk and Convex
+
+          You would need a Convex and Clerk account. Once done, create a new application and get the following API keys.
+
+          Your final `.env.local` should have:
+          ```ts
+          NEXT_PUBLIC_CONVEX_URL=https://xxx.convex.cloud
+
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
+          CLERK_SECRET_KEY=sk_test_xxx
+          CLERK_FRONTEND_API_URL=https://xxx.clerk.accounts.dev
+
+          CLERK_WEBHOOK_SECRET=whsec_xxx
+          ```
+
+          ```npm
+          npx convex dev
+          npx convex deploy
+          ```
+
+          <div className="_spacer mt-8" />
+          ### Configure Application parameters (optional)
+
+          Centralize your settings in `config/comments.ts`:
+
+          ```typescript
+          export const COMMENTS_CONFIG = {
+            PAGE_SIZE: 40,
+            MAX_COMMENTS_PER_POST: 1200,
+            WARNING_THRESHOLD: 0.9,
+            ARCHIVE_DISPLAY_THRESHOLD: 500,
+            MAX_REPLY_DEPTH: 3,
+            MAX_CHARACTERS: 3000,
+            DRAFT_SAVE_DELAY: 500,
+          } as const;
+          ```
+    </div>
+
+</section>
+
+## Thats it!
+
+Seen a bug or need some help? Submit an issue on [GitHub](https://github.com/ben-dev10/remark).

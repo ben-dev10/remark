@@ -141,13 +141,13 @@ export default function CommentsList({ postId }: CommentListProps) {
   // CASE 1: Not connected to internet (first time, no cached data)
   if (!isOnline && !hasEverFetched && !cachedComments) {
     return (
-      <div className="_comments-list min-h-30 mt-20 p-5">
+      <div className="_comments-list min-h-30 mb-20 mt-15 p-5">
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <WifiOff className="w-12 h-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold text-muted-foreground mb-2">
             No Internet Connection
           </h3>
-          <p className="text-gray-500 mb-4">
+          <p className="text-muted-foreground mb-4">
             Please check your connection and try again.
           </p>
           <Button
@@ -198,30 +198,30 @@ export default function CommentsList({ postId }: CommentListProps) {
   // }
 
   // CASE 2: Connection timeout (connected but taking too long)
-  if (isTimeout && !hasEverFetched) {
-    return (
-      <div className="_comments-list min-h-30 border p-5">
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <AlertCircle className="w-12 h-12 text-yellow-500 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
-            Connection Timeout
-          </h3>
-          <p className="text-gray-500 mb-4">
-            Taking longer than expected to load comments. This might be due to
-            slow connection.
-          </p>
-          <Button
-            onClick={handleRetry}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Try Again
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // if (isTimeout && !hasEverFetched) {
+  //   return (
+  //     <div className="_comments-list min-h-30 border p-5">
+  //       <div className="flex flex-col items-center justify-center py-12 text-center">
+  //         <AlertCircle className="w-12 h-12 text-yellow-500 mb-4" />
+  //         <h3 className="text-lg font-semibold text-gray-700 mb-2">
+  //           Connection Timeout
+  //         </h3>
+  //         <p className="text-gray-500 mb-4">
+  //           Taking longer than expected to load comments. This might be due to
+  //           slow connection.
+  //         </p>
+  //         <Button
+  //           onClick={handleRetry}
+  //           variant="outline"
+  //           className="flex items-center gap-2"
+  //         >
+  //           <RefreshCw className="w-4 h-4" />
+  //           Try Again
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // CASE 3: Loading (connected, waiting for data, no cache)
   if (comments === undefined && !cachedComments) {
@@ -270,7 +270,7 @@ export default function CommentsList({ postId }: CommentListProps) {
   const showWarning = isApproachingLimit(totalComments);
 
   return (
-    <div className="_comments-list min-h-30 mt-5 p-5">
+    <div className="_comments-list min-h-30 mt-5">
       {!isOnline && (
         <div className="ml-auto mb-6 top-2 z-10 flex max-w-max items-center gap-2 px-4 py-2 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400 text-sm rounded-lg">
           <WifiOff className="w-4 h-4" />
@@ -335,7 +335,7 @@ export default function CommentsList({ postId }: CommentListProps) {
         totalComments={totalComments}
       />
 
-      <div className="_comments-thread flex flex-col gap-6">
+      <div className="_comments-thread dark:bg-[#0c0c0c] min-h-30 bg-neutral-50 relative z-2 border-border/50 border p-4 rounded-xl flex flex-col gap-6">
         {sortedTopLevel.map((comment) => (
           <CommentThread
             key={comment._id}
@@ -349,28 +349,29 @@ export default function CommentsList({ postId }: CommentListProps) {
         ))}
       </div>
 
-      {hasMore && !isLocked && (
-        <div className="_load-more mt-6 flex justify-center">
-          <Button
-            onClick={handleLoadMore}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <ChevronDown className="w-4 h-4" />
-            Load More Comments (
-            {pagination?.totalTopLevel && sortedTopLevel.length
-              ? pagination.totalTopLevel - sortedTopLevel.length
-              : 0}{" "}
-            remaining)
-          </Button>
-        </div>
-      )}
-
-      {!hasMore && displayComments.length > 0 && (
-        <div className="_end-of-comments mt-10 text-center text-sm text-muted-foreground">
-          <p>End of comments</p>
-        </div>
-      )}
+      <div className="_bottom">
+        {hasMore && !isLocked && (
+          <div className="_load-more mt-6 flex justify-center">
+            <Button
+              onClick={handleLoadMore}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <ChevronDown className="w-4 h-4" />
+              Load More Comments (
+              {pagination?.totalTopLevel && sortedTopLevel.length
+                ? pagination.totalTopLevel - sortedTopLevel.length
+                : 0}{" "}
+              remaining)
+            </Button>
+          </div>
+        )}
+        {!hasMore && displayComments.length > 0 && (
+          <div className="_end-of-comments -mt-5 py-4 pt-9 border border-border/20 rounded-bl-xl rounded-br-xl dark:bg-black bg-neutral-100 text-center text-sm text-muted-foreground">
+            <p>End of comments</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

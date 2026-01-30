@@ -47,7 +47,7 @@ export function CommentSortSelector({
       </div>
 
       <div className="flex items-center gap-2">
-        <ArrowUpDown className="w-4 h-4 text-gray-500" />
+        <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
         <Select value={value} onValueChange={onChange}>
           <SelectTrigger className="w-45 h-9">
             <SelectValue placeholder="Sort by..." />
@@ -105,7 +105,7 @@ export function DeleteCommentDialog({
           <AlertDialogDescription>
             Are you sure you want to delete this comment? This action cannot be
             undone.
-            <span className="block mt-2 text-xs text-gray-500">
+            <span className="block mt-2 text-xs text-muted-foreground">
               Note: Replies to this comment will remain visible.
             </span>
           </AlertDialogDescription>
