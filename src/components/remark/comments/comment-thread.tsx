@@ -63,7 +63,7 @@ export function CommentThread({
       />
 
       {hasReplies && (
-        <div className="ml-1 space-y-4 border-l border-muted-foreground/20 pl-8">
+        <div className="ml-6 space-y-4 border-l border-muted-foreground/20 pl-4">
           {replies.map((reply) => (
             <CommentThread
               key={reply._id}

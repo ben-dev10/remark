@@ -1,12 +1,9 @@
-// config/comments.ts
-// Centralized configuration for the comments system
-
 export const COMMENTS_CONFIG = {
   /**
-   * Number of top-level comments to load per page
+   * Number of top-level comments to load per page (load limit)
    * Includes all nested replies for those comments
    */
-  PAGE_SIZE: 40, // load limit
+  PAGE_SIZE: 40,
 
   /**
    * Maximum total comments (top-level + replies) allowed per post
@@ -42,9 +39,6 @@ export const COMMENTS_CONFIG = {
   DRAFT_SAVE_DELAY: 500,
 } as const;
 
-/**
- * Helper to check if post is approaching limit
- */
 export function isApproachingLimit(currentCount: number): boolean {
   return (
     currentCount >=
@@ -52,16 +46,10 @@ export function isApproachingLimit(currentCount: number): boolean {
   );
 }
 
-/**
- * Helper to check if post is locked
- */
 export function isPostLocked(currentCount: number): boolean {
   return currentCount >= COMMENTS_CONFIG.MAX_COMMENTS_PER_POST;
 }
 
-/**
- * Helper to get remaining comment slots
- */
 export function getRemainingComments(currentCount: number): number {
   return Math.max(0, COMMENTS_CONFIG.MAX_COMMENTS_PER_POST - currentCount);
 }

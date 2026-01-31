@@ -151,7 +151,7 @@ export default function CommentsForm({
                   variant="ghost"
                   onClick={handleCancel}
                   disabled={submitting || !isOnline || isOptimistic}
-                  className="px-3 py-1 rounded-md"
+                  className="px-3 py-1 rounded-lg"
                 >
                   Cancel
                 </Button>

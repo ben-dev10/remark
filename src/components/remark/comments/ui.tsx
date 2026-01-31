@@ -101,12 +101,14 @@ export function DeleteCommentDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Comment</AlertDialogTitle>
+          <AlertDialogTitle className="text-[1.3rem]">
+            Delete Comment
+          </AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this comment? This action cannot be
             undone.
-            <span className="block mt-2 text-xs text-muted-foreground">
-              Note: Replies to this comment will remain visible.
+            <span className="block mt-5 text-xs text-muted-foreground">
+              <b>Note:</b> Replies to this comment will remain visible.
             </span>
           </AlertDialogDescription>
         </AlertDialogHeader>

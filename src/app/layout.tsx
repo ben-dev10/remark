@@ -24,7 +24,7 @@ export default function RootLayout({
     <ClerkProvider appearance={{ theme: shadcn }}>
       <html lang="en">
         <body
-          className={`${ppe.variable} ${sfPro.variable} _ui ${berkeleyMono.variable} font-sans antialiased`}
+          className={`${ppe.variable} ${sfPro.variable} _ui ${berkeleyMono.variable} font-sans overflow-x-hidden antialiased`}
         >
           <ConvexClientProvider>
             <ThemeProvider>

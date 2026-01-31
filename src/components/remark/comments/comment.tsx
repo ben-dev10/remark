@@ -14,6 +14,7 @@ import ReplyForm from "./reply-form";
 import { Button } from "@/components/ui/button";
 import { DeleteCommentDialog } from "./ui";
 import CommentReactions from "./comment-reactions";
+import { COMMENTS_CONFIG } from "./config/comments";
 
 export interface CommentProps {
   comment: CommentWithUser;
@@ -34,14 +35,14 @@ const Comment = ({
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
   const { isSignedIn } = useOptimisticAuth();
+
   const deleteComment = useMutation(api.comments.comments.deleteComment);
   const isOwner = currentUserId === comment.user?.clerkId;
   const isDeleted = comment.isDeleted;
 
-  // limit reply depth to prevent infinite nesting
-  const MAX_DEPTH = 3;
-  const canReply = depth < MAX_DEPTH;
+  const canReply = depth < COMMENTS_CONFIG.MAX_REPLY_DEPTH;
 
   const handleDelete = async () => {
     try {
@@ -79,10 +80,9 @@ const Comment = ({
     setIsReplying(false);
   };
 
-  // deleted comment placeholder
   if (isDeleted) {
     return (
-      <div className="space-y-3">
+      <div className="_deleted-comment-placeholder space-y-3">
         <div className="flex gap-3">
           <div className="w-10 h-10 rounded-full bg-muted" />
           <div className="flex-1 min-w-0">
@@ -122,7 +122,7 @@ const Comment = ({
           </div>
         ) : (
           <>
-            <div className="_comment-content  rounded-lg p-3">
+            <div className="_comment-content rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
                 <span className="font-semibold">
                   <UserAvatar user={comment.user} />
@@ -174,14 +174,14 @@ const Comment = ({
                     onClick={handleEditClick}
                     className="flex items-center gap-1 font-medium text-muted-foreground hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors"
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="size-4" />
                     Edit
                   </button>
                   <button
                     onClick={() => setShowDeleteDialog(true)}
                     className="flex items-center gap-1 font-medium text-muted-foreground hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="size-4" />
                     Delete
                   </button>
                 </>

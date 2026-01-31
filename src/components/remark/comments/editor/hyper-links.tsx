@@ -124,7 +124,7 @@ export function HyperLink({
         }}
         placeholder="My Link (optional)"
       />
-      <div className="flex gap-1 mt-2">
+      <div className="flex justify-end gap-1 mt-2">
         <button className={cn(buttonVariants())} type="submit">
           {isInsert ? "Insert" : "Save"}
         </button>

@@ -161,9 +161,7 @@ const complexComment: JSONContent = {
   ],
 };
 
-/**
- * export mock comments array with threading [1]
- */
+// [1]
 export const mockThreadedComments = [
   {
     _id: "comment_1",
@@ -180,7 +178,6 @@ export const mockThreadedComments = [
     },
   },
 
-  // REPLY TO COMMENT 1
   {
     _id: "comment_2",
     _creationTime: 1769135913778,
@@ -188,7 +185,7 @@ export const mockThreadedComments = [
     userId: "user_def",
     content: JSON.stringify(boldComment),
     createdAt: Date.now() - 3000000, // 50 mins ago
-    parentCommentId: "comment_1", // ✅ Points to comment_1 above
+    parentCommentId: "comment_1",
     user: {
       username: "Bob",
       avatarUrl: "https://...",
@@ -196,7 +193,6 @@ export const mockThreadedComments = [
     },
   },
 
-  // ANOTHER REPLY TO COMMENT 1
   {
     _id: "comment_3",
     _creationTime: 1769135913779,
@@ -204,7 +200,7 @@ export const mockThreadedComments = [
     userId: "user_ghi",
     content: JSON.stringify(linkComment),
     createdAt: Date.now() - 1800000, // 30 mins ago
-    parentCommentId: "comment_1", // ✅ Also points to comment_1
+    parentCommentId: "comment_1",
     user: {
       username: "Charlie",
       avatarUrl: "https://...",
@@ -212,7 +208,6 @@ export const mockThreadedComments = [
     },
   },
 
-  // NESTED REPLY (reply to comment_2)
   {
     _id: "comment_4",
     _creationTime: 1769135913780,
@@ -220,7 +215,7 @@ export const mockThreadedComments = [
     userId: "user_jkl",
     content: JSON.stringify(strikethroughComment),
     createdAt: Date.now() - 1200000, // 20 mins ago
-    parentCommentId: "comment_2", // ✅ Points to comment_2 (creates nesting)
+    parentCommentId: "comment_2",
     user: {
       username: "David",
       avatarUrl: "https://...",
@@ -228,7 +223,6 @@ export const mockThreadedComments = [
     },
   },
 
-  // TOP-LEVEL COMMENT 2 (separate thread)
   {
     _id: "comment_5",
     _creationTime: 1769135913781,
@@ -236,7 +230,7 @@ export const mockThreadedComments = [
     userId: "user_mno",
     content: JSON.stringify(complexComment),
     createdAt: Date.now() - 600000, // 10 mins ago
-    parentCommentId: undefined, // ✅ No parent (new thread)
+    parentCommentId: undefined,
     user: {
       username: "Eve",
       avatarUrl: "https://...",
@@ -298,13 +292,10 @@ export const mockComments: MockComment[] = [
   },
 ];
 
-/**
- * Mock data with threading structure for testing
- */
+// Mock data with threading structure for testing
 export const mockCommentsWithReplies: Array<
   MockComment & { parentCommentId?: string }
 > = [
-  // Top-level comment 1
   {
     id: "comment_1",
     author: "Sarah Johnson",
@@ -312,34 +303,30 @@ export const mockCommentsWithReplies: Array<
     timestamp: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
     content: simpleComment,
   },
-  // Reply to comment_1
   {
     id: "comment_2",
     author: "Mike Chen",
     avatar: "MC",
     timestamp: new Date(Date.now() - 1000 * 60 * 50), // 50 minutes ago
     content: boldComment,
-    parentCommentId: "comment_1", // ✅ This references comment_1 above
+    parentCommentId: "comment_1",
   },
-  // Another reply to comment_1
   {
     id: "comment_3",
     author: "Emma Davis",
     avatar: "ED",
     timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
     content: mixedFormattingComment,
-    parentCommentId: "comment_1", // ✅ Another reply to comment_1
+    parentCommentId: "comment_1",
   },
-  // Nested reply (reply to a reply)
   {
     id: "comment_4",
     author: "Alex Kumar",
     avatar: "AK",
     timestamp: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
     content: linkComment,
-    parentCommentId: "comment_2", // ✅ This is a reply to comment_2
+    parentCommentId: "comment_2",
   },
-  // Top-level comment 2
   {
     id: "comment_5",
     author: "Jessica Wong",
@@ -347,16 +334,14 @@ export const mockCommentsWithReplies: Array<
     timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
     content: multiParagraphComment,
   },
-  // Reply to comment_5
   {
     id: "comment_6",
     author: "David Lee",
     avatar: "DL",
     timestamp: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
     content: strikethroughComment,
-    parentCommentId: "comment_5", // ✅ Reply to comment_5
+    parentCommentId: "comment_5",
   },
-  // Top-level comment 3 (no replies)
   {
     id: "comment_7",
     author: "Priya Patel",

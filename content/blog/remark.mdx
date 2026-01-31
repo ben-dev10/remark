@@ -5,6 +5,10 @@ author: "@nard"
 date: 2026-01-15
 ---
 
+import RemarkDefinition from "../remark-definition.tsx";
+
+<RemarkDefinition />
+
 Building a modern comment system requires more than just storing text in a database. Our implementation showcases several cutting-edge features that deliver an exceptional user experience.
 
 <div className="_spacer mt-10" />
@@ -46,7 +50,7 @@ useEditorPersistence(editor, {
 
 <div className="_spacer mt-15" />
 
-## Rich Text Editing with <span className="font-mono bg-secondary -mt-1 border rounded-md p-1 text-[1.2rem]">TipTap</span>
+## Rich Text Editing with Tiptap
 
 We use TipTap for a powerful editing experience: it enables rich text-editing from basic formatting to links and @mentions (mentions will be supported in a later update, stay tuned)
 
@@ -137,10 +141,16 @@ await ctx.db
 
 This is just the beginning! Future enhancements could include:
 
-- 🔍 **Search** - Find comments by keyword
-- 📊 **Analytics** - Track engagement metrics
-- 🌐 **i18n** - Multi-language support
+{/* prettier-ignore */}
+<div className="ml-8">
+  - Image uploads, emoji picker 
+  - **Search** - Find comments by keyword 
+  - **Analytics** - Track engagement metrics 
+  - **i18n** - Multi-language support
+</div>
 
-Ready to integrate this into your own project? Check out our [setup guide](/blog/remark-setup) to get started!
+<div className="_spacer mt-10" />
+Ready to integrate this into your own project? Check out our [setup
+guide](/blog/remark-setup) to get started!
 
 <div className="_spacer mb-10" />

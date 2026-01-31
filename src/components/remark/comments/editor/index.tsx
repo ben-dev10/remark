@@ -106,9 +106,11 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
     }, [disabled, editor]);
 
     if (!editor) {
-      // placeholder render until Tiptap's render of the editor is complete
       return (
-        <div {...containerProps} className="_comment-editor p-3 h-25">
+        <div
+          {...containerProps}
+          className="_comment-editor-placeholder p-3 h-25"
+        >
           <p {...props.editorProps} className="text-muted-foreground">
             {props.placeholder}
           </p>
@@ -129,7 +131,7 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
         <EditorContent
           editor={editor}
           {...props.editorProps}
-          className="tiptap outline-none! rounded-md"
+          className="tiptap  rounded-md"
         />
 
         <div className="_btns flex mt-2 items-center justify-between">
@@ -170,7 +172,7 @@ export const toggleVariants = cva(
   {
     variants: {
       active: {
-        true: "dark:bg-primary/30 bg-primary text-white dark:text-white",
+        true: "dark:bg-primary/30 bg-primary/70 text-white dark:text-white",
       },
     },
     defaultVariants: {

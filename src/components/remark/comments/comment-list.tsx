@@ -1,7 +1,7 @@
 "use client";
 import { api } from "@/convex/_generated/api";
 import { CommentWithUser } from "@/utils/types/convex";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "convex/react";
 import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
 import {
@@ -20,23 +20,19 @@ import { sortComments } from "./comment-sorting";
 import { CommentThread, organizeCommentsIntoThreads } from "./comment-thread";
 import { COMMENTS_CONFIG, isApproachingLimit } from "./config/comments";
 import { useOnline } from "@/hooks/use-online";
+import { mockThreadedComments } from "@/utils/lib/mock-comments-data";
+import { Callout } from "fumadocs-ui/components/callout";
+import ChatIcon from "@/icons/chat-icon";
 
 interface CommentListProps {
   postId: string;
 }
 
-const retryTimeout = 15000; // 15 second timeout
-
 export default function CommentsList({ postId }: CommentListProps) {
   const { user } = useOptimisticAuth();
   const currentUserId = user?.id;
-  const isOnline = useOnline();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // network state management
-  const [hasEverFetched, setHasEverFetched] = useState(false);
-  const [isTimeout, setIsTimeout] = useState(false);
-  const [showOfflineBadge, setShowOfflineBadge] = useState(false);
+  const isOnline = useOnline();
   const [cachedComments, setCachedComments] = useState<
     CommentWithUser[] | null
   >(null);
@@ -78,57 +74,19 @@ export default function CommentsList({ postId }: CommentListProps) {
     if (cached) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCachedComments(cached);
-      setHasEverFetched(true);
     }
   }, [postId]);
 
   // update cache when live data arrives
   useEffect(() => {
     if (accumulatedComments && accumulatedComments.length > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHasEverFetched(true);
-      setIsTimeout(false);
-
       storageManager.cacheComments(postId, accumulatedComments);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCachedComments(accumulatedComments);
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
     }
   }, [accumulatedComments, postId]);
 
-  useEffect(() => {
-    if (!isOnline) return;
-
-    // Only set timeout if we're loading and haven't fetched before
-    if (accumulatedComments?.length === 0 && !hasEverFetched) {
-      timeoutRef.current = setTimeout(() => {
-        setIsTimeout(true);
-      }, retryTimeout);
-    }
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-  }, [accumulatedComments, isOnline, hasEverFetched]);
-
-  // show offline badge if user goes offline after fetching data
-  useEffect(() => {
-    if (!isOnline && hasEverFetched) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setShowOfflineBadge(true);
-    } else {
-      setShowOfflineBadge(false);
-    }
-  }, [isOnline, hasEverFetched]);
-
   const handleRetry = () => {
-    setIsTimeout(false);
     setEnableQuery(false);
     setTimeout(() => setEnableQuery(true), 0);
   };
@@ -136,10 +94,11 @@ export default function CommentsList({ postId }: CommentListProps) {
   const handleLoadMore = () => {
     setLoadedCount((prev) => prev + COMMENTS_CONFIG.PAGE_SIZE);
   };
+
   const comments = isOnline ? accumulatedComments : cachedComments;
 
-  // CASE 1: Not connected to internet (first time, no cached data)
-  if (!isOnline && !hasEverFetched && !cachedComments) {
+  // CASE 1: Not connected to internet
+  if (!isOnline && !cachedComments) {
     return (
       <div className="_comments-list min-h-30 mb-20 mt-15 p-5">
         <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -164,66 +123,7 @@ export default function CommentsList({ postId }: CommentListProps) {
     );
   }
 
-  // ❌ FIX
-  // if (!isOnline && cachedComments) {
-  //   return (
-  //     <div className="pt-5">
-  //       <div className="top-2 z-10 mb-4 flex items-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm rounded-lg">
-  //         <WifiOff className="w-4 h-4" />
-  //         <span className="flex-1">
-  //           {cachedComments
-  //             ? "You're offline. Showing cached comments."
-  //             : "You're offline. Comments will sync when you reconnect."}
-  //         </span>
-  //         {isOnline && (
-  //           <div className="flex items-center gap-1 text-green-600">
-  //             <Wifi className="w-4 h-4" />
-  //             <span className="text-xs">Reconnecting...</span>
-  //           </div>
-  //         )}
-  //       </div>
-
-  //       <div className="flex flex-col gap-6 px-5">
-  //         {cachedComments.map((c) => (
-  //           <Comment
-  //             key={c._id}
-  //             comment={c}
-  //             postId={postId}
-  //             currentUserId={currentUserId}
-  //           />
-  //         ))}
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // CASE 2: Connection timeout (connected but taking too long)
-  // if (isTimeout && !hasEverFetched) {
-  //   return (
-  //     <div className="_comments-list min-h-30 border p-5">
-  //       <div className="flex flex-col items-center justify-center py-12 text-center">
-  //         <AlertCircle className="w-12 h-12 text-yellow-500 mb-4" />
-  //         <h3 className="text-lg font-semibold text-gray-700 mb-2">
-  //           Connection Timeout
-  //         </h3>
-  //         <p className="text-gray-500 mb-4">
-  //           Taking longer than expected to load comments. This might be due to
-  //           slow connection.
-  //         </p>
-  //         <Button
-  //           onClick={handleRetry}
-  //           variant="outline"
-  //           className="flex items-center gap-2"
-  //         >
-  //           <RefreshCw className="w-4 h-4" />
-  //           Try Again
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // CASE 3: Loading (connected, waiting for data, no cache)
+  // CASE 2: Loading (connected, waiting for data, no cache)
   if (comments === undefined && !cachedComments) {
     return (
       <div className="_comments-list min-h-30 mt-15 p-5">
@@ -237,27 +137,26 @@ export default function CommentsList({ postId }: CommentListProps) {
     );
   }
 
-  // CASE 4: No comments
+  // CASE 3: No comments
   if (comments === null || (Array.isArray(comments) && comments.length === 0)) {
     return (
-      <div className="_comments-list min-h-30 p-5 relative">
-        {showOfflineBadge && (
-          <div className="absolute top-2 right-2 flex items-center gap-2 px-3 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-            <WifiOff className="w-3 h-3" />
-            Offline
-          </div>
-        )}
-
+      <div className="_comments-list min-h-30 py-20 p-5 relative">
         <div className="flex items-center justify-center py-8">
-          <p className="text-muted-foreground">
-            No comments yet. Be the first to comment!
-          </p>
+          <div className="flex flex-col items-center">
+            <div className="mb-5">
+              <ChatIcon className="size-15 text-muted-foreground/60" />
+            </div>
+            <h4 className="text-muted-foreground">Comments Empty</h4>
+            <p className="text-muted-foreground">
+              No comments yet. Be the first to comment!
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // CASE 5: Comments loaded (live or cached)
+  // CASE 4: Comments loaded (live or cached)
   const displayComments = comments || [];
 
   // Organize into threads and sort
@@ -272,7 +171,7 @@ export default function CommentsList({ postId }: CommentListProps) {
   return (
     <div className="_comments-list min-h-30 mt-5">
       {!isOnline && (
-        <div className="ml-auto mb-6 top-2 z-10 flex max-w-max items-center gap-2 px-4 py-2 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400 text-sm rounded-lg">
+        <div className="_offline-badge ml-auto mb-6 top-2 z-10 flex max-w-max items-center gap-2 px-4 py-2 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400 text-sm rounded-lg">
           <WifiOff className="w-4 h-4" />
           <span className="flex-1">
             {cachedComments
@@ -282,51 +181,56 @@ export default function CommentsList({ postId }: CommentListProps) {
           {isOnline && (
             <div className="flex items-center ml-8 gap-1 text-green-600 dark:text-green-300">
               <Wifi className="w-4 h-4" />
-              <span className="text-xs">Trying to reconnect...</span>
+              <span className="text-xs">Reconnecting...</span>
             </div>
           )}
         </div>
       )}
 
       {isLocked && (
-        <div className="_locked-notice mb-4 flex items-start gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
-          <Lock className="w-5 h-5 text-red-600 mt-0.5" />
-          <div className="flex-1">
-            <h4 className="font-semibold text-red-900">Discussion Locked</h4>
-            <p className="text-sm text-red-700">
-              This discussion has reached the maximum of{" "}
-              {COMMENTS_CONFIG.MAX_COMMENTS_PER_POST} comments and is now
-              read-only.
-            </p>
-          </div>
-        </div>
+        <Callout
+          title="Discussion Locked"
+          type="error"
+          className="_locked-notice text-red-700 dark:text-red-400"
+          icon={<Lock className="size-4 text-red-700 dark:text-red-400" />}
+        >
+          <p className="text-sm ">
+            This discussion has reached the maximum of{" "}
+            {COMMENTS_CONFIG.MAX_COMMENTS_PER_POST} comments and is now
+            read-only.
+          </p>
+        </Callout>
       )}
 
       {!isLocked && showWarning && status && (
-        <div className="_warning-notice mb-4 flex items-start gap-3 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
-          <div className="flex-1">
-            <h4 className="font-semibold text-yellow-900">Approaching Limit</h4>
-            <p className="text-sm text-yellow-700">
-              This discussion is approaching the maximum comment limit.{" "}
-              <span className="font-semibold">{status.remaining}</span> comments
-              remaining.
-            </p>
-          </div>
-        </div>
+        <Callout
+          title="Approaching Limit"
+          type="warn"
+          className="_locked-notice text-orange-700 dark:text-orange-400"
+          icon={
+            <AlertCircle className="size-4 text-orange-700 dark:text-orange-400" />
+          }
+        >
+          <p className="text-sm ">
+            This discussion is approaching the maximum comment limit.{" "}
+            <span className="font-semibold">{status.remaining}</span> comments
+            remaining.
+          </p>
+        </Callout>
       )}
 
       {displayComments.length > COMMENTS_CONFIG.ARCHIVE_DISPLAY_THRESHOLD && (
-        <div className="_archive-notice mb-4 flex items-start gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <Archive className="w-5 h-5 text-blue-600 mt-0.5" />
-          <div className="flex-1">
-            <h4 className="font-semibold text-blue-900">Archived Discussion</h4>
-            <p className="text-sm text-blue-700">
-              This is a large discussion with {totalComments} comments. Showing
-              the most recent {displayComments.length} comments.
-            </p>
-          </div>
-        </div>
+        <Callout
+          title="Archived Discussion"
+          type="info"
+          className="_archived-notice text-blue-700 dark:text-blue-400"
+          icon={<Archive className="size-4 text-blue-700 dark:text-blue-400" />}
+        >
+          <p className="text-sm ">
+            This is a large discussion with {totalComments} comments. Showing
+            the most recent {displayComments.length} comments.
+          </p>
+        </Callout>
       )}
 
       <CommentSortSelector
@@ -335,7 +239,7 @@ export default function CommentsList({ postId }: CommentListProps) {
         totalComments={totalComments}
       />
 
-      <div className="_comments-thread dark:bg-[#0c0c0c] min-h-30 bg-neutral-50 relative z-2 border-border/50 border p-4 rounded-xl flex flex-col gap-6">
+      <div className="_comments pb-15 dark:bg-[#0c0c0c] min-h-30 bg-[#fdfdfd] relative z-2 dark:border-border/70 border p-4 rounded-xl flex flex-col gap-6">
         {sortedTopLevel.map((comment) => (
           <CommentThread
             key={comment._id}
@@ -349,7 +253,7 @@ export default function CommentsList({ postId }: CommentListProps) {
         ))}
       </div>
 
-      <div className="_bottom">
+      <div className="_bottom-actions -mt-5 py-4 pt-9 border border-border/90 shadow-sm dark:shadow-black shadow-black/5 rounded-bl-xl rounded-br-xl dark:bg-black bg-neutral-100">
         {hasMore && !isLocked && (
           <div className="_load-more mt-6 flex justify-center">
             <Button
@@ -367,7 +271,7 @@ export default function CommentsList({ postId }: CommentListProps) {
           </div>
         )}
         {!hasMore && displayComments.length > 0 && (
-          <div className="_end-of-comments -mt-5 py-4 pt-9 border border-border/20 rounded-bl-xl rounded-br-xl dark:bg-black bg-neutral-100 text-center text-sm text-muted-foreground">
+          <div className="_end-of-comments  text-center text-sm text-muted-foreground">
             <p>End of comments</p>
           </div>
         )}
