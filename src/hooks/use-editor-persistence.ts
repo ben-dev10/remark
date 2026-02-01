@@ -68,7 +68,6 @@ export function useEditorPersistence(
     [editorId, enabled, debounceMs, onSave],
   );
 
-  // Clear saved draft
   const clearDraft = useCallback(() => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -77,7 +76,6 @@ export function useEditorPersistence(
     hasRestoredRef.current = false;
   }, [editorId]);
 
-  // Restore draft from localStorage
   const restoreDraft = useCallback(() => {
     if (!enabled || !editor || hasRestoredRef.current) return false;
 
@@ -117,11 +115,9 @@ export function useEditorPersistence(
 
       const content = editor.getJSON();
 
-      // Only save if editor has content
       if (!editor.isEmpty) {
         saveDraft(content);
       } else {
-        // Clear draft if editor is empty
         clearDraft();
       }
     };

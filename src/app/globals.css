@@ -29,6 +29,10 @@
   button {
     cursor: pointer;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @layer utilities {
@@ -50,7 +54,7 @@
   }
   .container-8xl,
   [datatype="container-8xl"] {
-    @apply mx-auto max-w-[1440px];
+    @apply mx-auto max-w-360;
   }
 }
 
@@ -62,4 +66,8 @@
 }
 @utility debug-g {
   border: 1px solid green;
+}
+
+.shiki code {
+  @apply font-mono font-normal!;
 }

@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { InlineTOC } from "fumadocs-ui/components/inline-toc";
-import defaultMdxComponents from "fumadocs-ui/mdx";
 import { blog } from "@/lib/source";
 import { ArrowLeft } from "lucide-react";
 import Section from "@/components/_ui/section";
 import CommentsSection from "@/components/remark";
 import Background from "@/components/_ui/background";
+import { getMDXComponents } from "@/mdx-components";
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
@@ -65,9 +65,9 @@ export default async function Page(props: {
 
         <Section.Container container="7xl" className="relative z-2">
           <article className="_article-body p-6">
-            <div className="_mdx-content prose dark:prose-invert prose-headings:scroll-mt-8 prose-headings:font-semibold prose-a:no-underline prose-headings:tracking-tight prose-headings:text-balance prose-code:text-[0.90rem] prose-p:tracking-tight prose-p:leading-[1.8rem]! prose-lg max-w-none pb-30">
+            <div className="_mdx-content prose dark:prose-invert prose-headings:scroll-mt-22 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-balance prose-code:text-[0.90rem] prose-p:tracking-tight prose-p:leading-[1.8rem]! prose-lg max-w-none pb-30">
               <InlineTOC items={page.data.toc} className="mb-8" />
-              <Mdx components={defaultMdxComponents} />
+              <Mdx components={getMDXComponents()} />
             </div>
           </article>
         </Section.Container>
@@ -76,7 +76,7 @@ export default async function Page(props: {
           <div className="container-7xl pt-10">
             <CommentsSection
               title="Join the discussion."
-              description="Feel free to engage and share your ideas, but remember to be kind and respectful to one another."
+              description="Feel free to engage and share ideas, but remember to be kind and respectful to one another."
             />
           </div>
         </div>

@@ -2,15 +2,18 @@
 title: Setup & Integration Guide
 description: Step-by-step guide to integrate this comment system into your Next.js application with Convex and Clerk authentication.
 author: "@nard"
-date: 2026-01-15
+date: 2026-02-15
 ---
 
-This guide walks you through integrating Remark into your Next.js application. We'll cover everything from initial setup to advanced configuration.
+import { GITHUB_LINK } from "../../src/app/_components/constants.ts";
 
 <div className="_spacer mt-8" />
+
+This guide walks you through setting up a local copy of Remark.
+
 ## Prerequisites
 
-Before starting, ensure you have a local clone of the application from Github.
+Before starting, clone the source code from <Link href={`${GITHUB_LINK}/remark`} className="text-primary underline">Github</Link>.
 
 <section id="setup-section">
     <div className="fd-steps [&_h3]:fd-step">
@@ -21,10 +24,11 @@ Before starting, ensure you have a local clone of the application from Github.
           npm install
           ```
 
-          The core packages of the application
+          The core packages used in the application
 
           | Package         | Purpose                            |
           | --------------- | ---------------------------------- |
+          | `Next.js`       | Frontend                           |
           | `convex`        | Real-time database and backend     |
           | `@clerk/nextjs` | Authentication and user management |
           | `@tiptap/react` | Rich text editor                   |
@@ -33,28 +37,46 @@ Before starting, ensure you have a local clone of the application from Github.
           <div className="_spacer mt-8" />
           ### Initialize Clerk and Convex
 
-          You would need a Convex and Clerk account. Once done, create a new application and get the following API keys.
+          You will need both a Convex and Clerk account. Once acquired, set up a new application on each platform, then get the following API keys.
 
-          Your final `.env.local` should have:
-          ```ts
-          NEXT_PUBLIC_CONVEX_URL=https://xxx.convex.cloud
+          ```txt
+          # create a .env.local file and add the following values
 
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
-          CLERK_SECRET_KEY=sk_test_xxx
-          CLERK_FRONTEND_API_URL=https://xxx.clerk.accounts.dev
+          NEXT_PUBLIC_CONVEX_URL=https://xxx.convex.cloud        # 1
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx          # 2
 
-          CLERK_WEBHOOK_SECRET=whsec_xxx
+          CLERK_SECRET_KEY=sk_test_xxx                           # 3
+          CLERK_FRONTEND_API_URL=https://xxx.clerk.accounts.dev  # 4
+
+          CLERK_WEBHOOK_SECRET=whsec_xxx                         # 5
           ```
 
+          <div className="ml-8">
+            - \#1, \#2 is generated automatically when you run `npx convex dev`
+            - \#3,\#4 come from your Clerk dashboard. Follow the official docs <Link href="" className="text-primary underline">here</Link>
+            - \#5 is for Clerk-Convex webhook, it involves a few extra steps. See instructions below
+          </div>
+
+          <Callout type="info"> Don't forget to add `CLERK_FRONTEND_API_URL` to your Convex dashboard also. Dashboard -> Settings -> Environment Variables</Callout>
+
+          <div className="_spacer mt-12" />
+          ###### Clerk-Convex webhook setup
+          1. Go to Clerk dashboard → Configure → Webhooks
+          2. Add a new endpoint URL (this points to a Convex HTTP action from your Convex backend: you'll get that URL from your convex dashboard)
+          3. Subscribe to the necessary events, such as `user.created`, `user.updated`, and `user.deleted`. (search for user and check all actions)
+          4. Copy the secret key (starting with `whsec_`) to your environment variables.
+
+          <div className="_spacer mt-15" />
+          Once everything is configured, initialize Convex:
           ```npm
-          npx convex dev
-          npx convex deploy
+          npx convex dev # initialize convex
+          npx convex deploy # push changes to production instance
           ```
 
           <div className="_spacer mt-8" />
           ### Configure Application parameters (optional)
 
-          Centralize your settings in `config/comments.ts`:
+          You can update the settings at `@/components/remark/comments/config/comments.ts` to your preference.
 
           ```typescript
           export const COMMENTS_CONFIG = {
@@ -73,4 +95,4 @@ Before starting, ensure you have a local clone of the application from Github.
 
 ## Thats it!
 
-Seen a bug or need some help? Submit an issue on [GitHub](https://github.com/ben-dev10/remark).
+This project is free and open-source and welcomes any comments, contributions or feedbacks. When you see a bug or need some help feel free to reach out or submit an issue on [GitHub](https://github.com/ben-dev10/remark).

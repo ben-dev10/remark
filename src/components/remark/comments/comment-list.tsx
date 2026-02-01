@@ -20,7 +20,6 @@ import { sortComments } from "./comment-sorting";
 import { CommentThread, organizeCommentsIntoThreads } from "./comment-thread";
 import { COMMENTS_CONFIG, isApproachingLimit } from "./config/comments";
 import { useOnline } from "@/hooks/use-online";
-import { mockThreadedComments } from "@/utils/lib/mock-comments-data";
 import { Callout } from "fumadocs-ui/components/callout";
 import ChatIcon from "@/icons/chat-icon";
 

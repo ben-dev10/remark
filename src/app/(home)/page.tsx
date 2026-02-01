@@ -9,16 +9,24 @@ import { ChevronRight } from "lucide-react";
 
 export function Hero() {
   return (
-    <Section.RootElement className="mt-12">
+    <Section.RootElement className="mt-12 overflow-hidden">
       <Section.Container container="7xl" className="p-6 px-8 relative">
         <Background className="">
-          <Image
+          {/* <Image
             aria-hidden="true"
             width={1463}
             height={1112}
             src="/imgs/gradient.png"
             alt="gradient-img"
             className="absolute left-1/2 -translate-x-[50%] dark:opacity-20 mix-blend-overlay top-[calc(-144/16*1rem)] z-8 w-[calc(1463/16*1rem)] max-w-none"
+            style={{ color: "transparent" }}
+          /> */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            aria-hidden="true"
+            src="/imgs/gradient-2.png"
+            alt="gradient-img"
+            className="absolute left-1/2 -translate-x-[50%] dark:opacity-20 opacity-30 -z-1 top-[calc(-144/16*1rem)] w-[calc(1463/16*1rem)] max-w-none"
             style={{ color: "transparent" }}
           />
         </Background>
@@ -64,8 +72,8 @@ export function Hero() {
 
 export function CommentsDemo() {
   return (
-    <Section.RootElement>
-      <Section.Container container="7xl" className="p-6 px-8">
+    <Section.RootElement className="-mt-6">
+      <Section.Container container="7xl" className="p-6 pt-0 px-8">
         <CommentsSection customPostId="test-post-1" />
       </Section.Container>
     </Section.RootElement>

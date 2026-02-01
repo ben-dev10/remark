@@ -8,7 +8,6 @@ export function useOnline() {
   const [isOnline, setIsOnline] = useState(true);
 
   useLayoutEffect(() => {
-    // Set initial state - sync with browser's online status on mount
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOnline(navigator.onLine);
 

@@ -27,7 +27,7 @@
       "@/styles/*": ["./src/styles/*"],
       "@/lib/*": ["./src/utils/lib/*"],
       "@/convex/*": ["./convex/*"],
-      "@/mdx-components": ["./mdx-components.tsx"],
+      "@/mdx-components": ["mdx-components.tsx"],
       "fumadocs-mdx:collections/*": [".source/*"]
     }
   },
