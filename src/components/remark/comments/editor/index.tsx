@@ -55,8 +55,8 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
       onReady,
     });
 
+    // create a new editor instance
     useLayoutEffect(() => {
-      // create a new editor instance
       const instance = new Editor({
         editable: !propsRef.current.disabled,
         extensions: [
@@ -131,7 +131,7 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
         <EditorContent
           editor={editor}
           {...props.editorProps}
-          className="tiptap  rounded-md"
+          className="tiptap rounded-md"
         />
 
         <div className="_btns flex mt-2 items-center justify-between">

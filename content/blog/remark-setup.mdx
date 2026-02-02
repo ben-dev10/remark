@@ -1,6 +1,6 @@
 ---
 title: Setup & Integration Guide
-description: Step-by-step guide to integrate this comment system into your Next.js application with Convex and Clerk authentication.
+description: Step-by-step guide to set up Remark.
 author: "@nard"
 date: 2026-02-15
 ---
@@ -52,16 +52,16 @@ Before starting, clone the source code from <Link href={`${GITHUB_LINK}/remark`}
           ```
 
           <div className="ml-8">
-            - \#1, \#2 is generated automatically when you run `npx convex dev`
-            - \#3,\#4 come from your Clerk dashboard. Follow the official docs <Link href="" className="text-primary underline">here</Link>
+            - \#1, \#2 are generated automatically when you run `npx convex dev`
+            - \#3,\#4 come from your Clerk dashboard. Follow the official docs <Link href="https://clerk.com/docs/nextjs/getting-started/quickstart" className="text-primary underline">here</Link>
             - \#5 is for Clerk-Convex webhook, it involves a few extra steps. See instructions below
           </div>
 
-          <Callout type="info"> Don't forget to add `CLERK_FRONTEND_API_URL` to your Convex dashboard also. Dashboard -> Settings -> Environment Variables</Callout>
+          <Callout type="info"> Don't forget to add `CLERK_FRONTEND_API_URL` to your Convex dashboard also. Dashboard  → Settings  → Environment Variables</Callout>
 
           <div className="_spacer mt-12" />
           ###### Clerk-Convex webhook setup
-          1. Go to Clerk dashboard → Configure → Webhooks
+          1. Go to Clerk Dashboard → Configure → Webhooks
           2. Add a new endpoint URL (this points to a Convex HTTP action from your Convex backend: you'll get that URL from your convex dashboard)
           3. Subscribe to the necessary events, such as `user.created`, `user.updated`, and `user.deleted`. (search for user and check all actions)
           4. Copy the secret key (starting with `whsec_`) to your environment variables.
@@ -95,4 +95,4 @@ Before starting, clone the source code from <Link href={`${GITHUB_LINK}/remark`}
 
 ## Thats it!
 
-This project is free and open-source and welcomes any comments, contributions or feedbacks. When you see a bug or need some help feel free to reach out or submit an issue on [GitHub](https://github.com/ben-dev10/remark).
+This project is free and open-source and welcomes any comments, contributions or feedbacks. When you see a bug or need some help, feel free to reach out or submit an issue on [GitHub](https://github.com/ben-dev10/remark).

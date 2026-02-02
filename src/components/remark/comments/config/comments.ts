@@ -37,6 +37,11 @@ export const COMMENTS_CONFIG = {
    * Auto-save draft delay (ms)
    */
   DRAFT_SAVE_DELAY: 500,
+
+  /**
+   * Whether the comment replies are folded by default or not
+   */
+  DEFAULT_OPEN: false,
 } as const;
 
 export function isApproachingLimit(currentCount: number): boolean {

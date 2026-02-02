@@ -12,7 +12,7 @@ import Strikethrough from "@tiptap/extension-strike";
 import Code from "@tiptap/extension-code";
 
 /*
- * Accepts Tiptap JSON or JSON retrieved over the network from a db call.
+ * Accepts Tiptap JSON or standard JSON retrieved over the network from a db call.
  */
 interface ContentRendererProps {
   content: JSONContent | string | null | undefined;

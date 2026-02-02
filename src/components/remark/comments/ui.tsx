@@ -40,9 +40,10 @@ export function CommentSortSelector({
       <div className="flex items-center gap-2">
         <MessageSquare className="w-5 h-5 text-muted-foreground" />
         <span className="font-semibold text-foreground">
-          {/* <span className="p-1 rounded-full px-3 bg-accent"> */}
-          {totalComments} {/* </span> */}
-          {totalComments === 1 ? "Comment" : "Comments"}
+          {totalComments}{" "}
+          <span className="text-muted-foreground">
+            {totalComments === 1 ? "Comment" : "Comments"}
+          </span>
         </span>
       </div>
 
