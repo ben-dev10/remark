@@ -11,6 +11,7 @@ import Navbar from "./_components/navbar";
 import Footer from "./_components/footer";
 import { siteConfig } from "@/lib/site";
 import { metadata as baseMetadata, metadataKeywords } from "./metadata";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   ...baseMetadata,
@@ -41,6 +42,7 @@ export default function RootLayout({
                 {children}
                 <Footer />
 
+                <Analytics />
                 <Toaster
                   toastOptions={{
                     style: {
