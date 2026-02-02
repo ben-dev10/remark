@@ -98,10 +98,10 @@ const Comment = ({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="mb-3!">
       <div className="flex-1 min-w-0">
         {isEditing ? (
-          <div className="_edit-form space-y-2 relative">
+          <div className="_edit-form relative mr-2">
             <EditForm
               commentId={comment._id}
               initialContent={comment.content}
@@ -161,7 +161,7 @@ const Comment = ({
                     </>
                   ) : (
                     <>
-                      <Reply className="w-4 h-4" />
+                      {/* <Reply className="w-4 h-4" /> */}
                       Reply
                     </>
                   )}
@@ -174,14 +174,14 @@ const Comment = ({
                     onClick={handleEditClick}
                     className="flex items-center gap-1 font-medium text-muted-foreground hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors"
                   >
-                    <Edit2 className="size-4" />
+                    {/* <Edit2 className="size-4" /> */}
                     Edit
                   </button>
                   <button
                     onClick={() => setShowDeleteDialog(true)}
                     className="flex items-center gap-1 font-medium text-muted-foreground hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   >
-                    <Trash2 className="size-4" />
+                    {/* <Trash2 className="size-4" /> */}
                     Delete
                   </button>
                 </>

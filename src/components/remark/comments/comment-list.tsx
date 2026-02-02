@@ -25,9 +25,13 @@ import ChatIcon from "@/icons/chat-icon";
 
 interface CommentListProps {
   postId: string;
+  onStatusChange?: (status: { isLocked: boolean }) => void;
 }
 
-export default function CommentsList({ postId }: CommentListProps) {
+export default function CommentsList({
+  postId,
+  onStatusChange,
+}: CommentListProps) {
   const { user } = useOptimisticAuth();
   const currentUserId = user?.id;
 
@@ -69,6 +73,12 @@ export default function CommentsList({ postId }: CommentListProps) {
   const status = result?.status;
 
   useEffect(() => {
+    if (status) {
+      onStatusChange?.({ isLocked: status.isLocked });
+    }
+  }, [status, onStatusChange]);
+
+  useEffect(() => {
     const cached = storageManager.getCachedComments(postId);
     if (cached) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -101,7 +111,7 @@ export default function CommentsList({ postId }: CommentListProps) {
     return (
       <div className="_comments-list min-h-30 mb-20 mt-15 p-5">
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <WifiOff className="w-12 h-12 text-muted-foreground mb-4" />
+          <WifiOff className="size-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold text-muted-foreground mb-2">
             No Internet Connection
           </h3>
@@ -142,12 +152,14 @@ export default function CommentsList({ postId }: CommentListProps) {
       <div className="_comments-list min-h-30 py-20 p-5 relative">
         <div className="flex items-center justify-center py-8">
           <div className="flex flex-col items-center">
-            <div className="mb-5">
-              <ChatIcon className="size-15 text-muted-foreground/60" />
+            <div className="mb-1">
+              <ChatIcon className="size-12 rotate-5 text-muted-foreground/50" />
             </div>
-            <h4 className="text-muted-foreground">Comments Empty</h4>
+            <h3 className="text-xl font-medium text-muted-foreground mb-2">
+              No Comments
+            </h3>
             <p className="text-muted-foreground">
-              No comments yet. Be the first to comment!
+              There are no comments yet. Be the first to comment!
             </p>
           </div>
         </div>
@@ -158,7 +170,6 @@ export default function CommentsList({ postId }: CommentListProps) {
   // CASE 4: Comments loaded (live or cached)
   const displayComments = comments || [];
 
-  // Organize into threads and sort
   const { topLevel, repliesMap } = organizeCommentsIntoThreads(displayComments);
   const sortedTopLevel = sortComments(topLevel, sortBy, repliesMap);
 
@@ -238,7 +249,7 @@ export default function CommentsList({ postId }: CommentListProps) {
         totalComments={totalComments}
       />
 
-      <div className="_comments pb-15 dark:bg-[#0c0c0c] min-h-30 bg-[#fdfdfd] relative z-2 dark:border-border/70 border p-4 rounded-xl flex flex-col gap-6">
+      <div className="_comments pb-15 dark:bg-[#0c0c0c] min-h-30 bg-[#fdfdfd] relative z-2 dark:border-border/70 border p-4 rounded-xl flex flex-col space-y-3">
         {sortedTopLevel.map((comment) => (
           <CommentThread
             key={comment._id}
@@ -252,8 +263,8 @@ export default function CommentsList({ postId }: CommentListProps) {
         ))}
       </div>
 
-      <div className="_bottom-actions -mt-5 py-4 pt-9 border border-border/90 shadow-sm dark:shadow-black shadow-black/5 rounded-bl-xl rounded-br-xl dark:bg-black bg-neutral-100">
-        {hasMore && !isLocked && (
+      <div className="_bottom-actions -mt-5 py-4 pt-5 border border-border/90 shadow-sm dark:shadow-black shadow-black/5 rounded-bl-xl rounded-br-xl dark:bg-black bg-neutral-100">
+        {hasMore && (
           <div className="_load-more mt-6 flex justify-center">
             <Button
               onClick={handleLoadMore}
@@ -269,8 +280,9 @@ export default function CommentsList({ postId }: CommentListProps) {
             </Button>
           </div>
         )}
+
         {!hasMore && displayComments.length > 0 && (
-          <div className="_end-of-comments  text-center text-sm text-muted-foreground">
+          <div className="_end-of-comments pt-5 text-center text-sm text-muted-foreground">
             <p>End of comments</p>
           </div>
         )}

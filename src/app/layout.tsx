@@ -9,10 +9,18 @@ import { Toaster } from "sonner";
 import { berkeleyMono, ppe, sfPro } from "./_components/fonts";
 import Navbar from "./_components/navbar";
 import Footer from "./_components/footer";
+import { siteConfig } from "@/lib/site";
+import { metadata as baseMetadata, metadataKeywords } from "./metadata";
 
 export const metadata: Metadata = {
-  title: "Remark",
-  description: "Comments Section for blogs, articles and more.",
+  ...baseMetadata,
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.name,
+    template: `%s - ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: metadataKeywords,
 };
 
 export default function RootLayout({

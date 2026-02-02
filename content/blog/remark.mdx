@@ -21,10 +21,10 @@ In this article, I'll walk through some of the features and capabilities this st
 <div className="_spacer mt-10" />
 ## Real-Time Synchronization
 
-One of Convex's standout features of Convex is **real-time updates**.
+One of Convex's standout features is **real-time updates**.
 
 Traditionally, comment systems rely on polling or manual refreshes to stay in sync, but with Convex this happens automatically.
-Retries also happen automatically, when a network connection is restored after an offline period, Convex will reconnect immediately and updates with fresh data when possible.
+Retries also happen automatically, when a network connection is restored after an offline period, Convex will reconnect immediately and update with fresh data when possible.
 
 ```typescript
 // Convex automatically handles real-time sync
@@ -57,7 +57,7 @@ useEditorPersistence(editor, {
 
 ## Rich Text Editing with Tiptap
 
-TipTap powers the editor experience. It supports rich text formatting, links, and @mentions (mentions will be added in a later update, stay tuned)
+TipTap powers the editor experience. It supports rich text formatting, links, and @mentions (mentions will be added in a later update, stay tuned).
 
 ```typescript
 import { Editor } from "@tiptap/react";
@@ -79,7 +79,7 @@ const editor = new Editor({
 ## Pagination and Limits
 
 Uncontrolled fetches can hurt performance and memory usage. To avoid that, a batch load strategy was adopted, initial requests are capped at 40 top-level comments + all replies with a "load more" button
-to fetch the next 40. Currently "load more" is manual, but in the future, a cursor/position based automatic refetch feature will be implemented, where based on the cursor position or current position in the list will automatically trigger a fetch.
+to fetch the next 40. Currently "load more" is manual, but in the future, a cursor based automatic refetch feature will be implemented (cursor position or current position in the list will automatically trigger a fetch).
 
 ```typescript
 const COMMENTS_CONFIG = {
@@ -126,8 +126,8 @@ validate: (url) => /^https?:\/\//.test(url);
 
 {/* prettier-ignore */}
 <div className="ml-8">
-  - **Indexed queries**: comments when posted are attached indexes (`postId`,`userId`) which enables fast lookups when requested later. 
-  - **Optimistic UI patterns**: previous known states (eg: signed-in status) are used as default on load to
+  - **Indexed queries**: comments when posted are attached indexes (`postId`,`userId`) which enables fast lookups on requests. 
+  - **Optimistic UI patterns**: previously known states (eg: signed-in status) are cached and used as default on load (or refresh) to
   provide instant visual feedback before server confirms.
 </div>
 
@@ -164,5 +164,3 @@ Remark is still fresh out of the oven. Future enhancements include:
 <div className="_spacer mt-15" />
 Ready to integrate this into your own project? Check out the [setup
 guide](/blog/remark-setup) to get started.
-
-<div className="_spacer mb-10" />

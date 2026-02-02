@@ -1,5 +1,12 @@
 import { CommentWithUser } from "@/utils/types/convex";
 import Comment from "./comment";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { COMMENTS_CONFIG } from "./config/comments";
 
 /**
  * Organize flat comment list into a tree structure
@@ -29,9 +36,59 @@ export function organizeCommentsIntoThreads(comments: CommentWithUser[]) {
   return { topLevel, repliesMap };
 }
 
-/**
- * Recursive component to render comment with all its replies
- */
+// Recursive component to render nested replies without accordion
+interface NestedRepliesProps {
+  replies: CommentWithUser[];
+  postId: string;
+  currentUserId?: string;
+  repliesMap: Map<string, CommentWithUser[]>;
+  depth: number;
+  isLocked?: boolean;
+}
+
+function NestedReplies({
+  replies,
+  postId,
+  currentUserId,
+  repliesMap,
+  depth,
+  isLocked = false,
+}: NestedRepliesProps) {
+  return (
+    <>
+      {replies.map((reply) => {
+        const nestedReplies = repliesMap.get(reply._id) || [];
+        const hasNestedReplies = nestedReplies.length > 0;
+
+        return (
+          <div key={reply._id} className="space-y-4">
+            <Comment
+              comment={reply}
+              postId={postId}
+              currentUserId={currentUserId}
+              depth={depth}
+              isLocked={isLocked}
+            />
+
+            {hasNestedReplies && (
+              <div className="ml-6 border-l border-muted-foreground/20 pl-4">
+                <NestedReplies
+                  replies={nestedReplies}
+                  postId={postId}
+                  currentUserId={currentUserId}
+                  repliesMap={repliesMap}
+                  depth={depth + 1}
+                  isLocked={isLocked}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
 interface CommentThreadProps {
   comment: CommentWithUser;
   postId: string;
@@ -63,19 +120,34 @@ export function CommentThread({
       />
 
       {hasReplies && (
-        <div className="ml-6 space-y-4 border-l border-muted-foreground/20 pl-4">
-          {replies.map((reply) => (
-            <CommentThread
-              key={reply._id}
-              comment={reply}
-              postId={postId}
-              currentUserId={currentUserId}
-              repliesMap={repliesMap}
-              depth={depth + 1}
-              isLocked={isLocked}
-            />
-          ))}
-        </div>
+        <Accordion
+          type="single"
+          collapsible
+          className="mb-0!"
+          defaultValue={COMMENTS_CONFIG.DEFAULT_OPEN ? "replies" : ""}
+        >
+          <AccordionItem
+            value="replies"
+            className="border-none mb-0! [&_h3]:m-0!"
+          >
+            <AccordionTrigger className="p-1 ml-4 mb-0! text-sm max-w-max text-muted-foreground hover:text-foreground hover:no-underline">
+              View {replies.length === 1 ? "reply" : "replies"} (
+              {replies.length})
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="ml-6 border-l border-muted-foreground/20 pl-4 pt-2">
+                <NestedReplies
+                  replies={replies}
+                  postId={postId}
+                  currentUserId={currentUserId}
+                  repliesMap={repliesMap}
+                  depth={depth + 1}
+                  isLocked={isLocked}
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       )}
     </div>
   );

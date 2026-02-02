@@ -1,9 +1,8 @@
 "use client";
-import { useQuery } from "convex/react";
 import CommentsForm from "./comments/comment-form";
 import CommentsList from "./comments/comment-list";
-import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 
 export default function CommentsSection({
   customPostId,
@@ -19,8 +18,7 @@ export default function CommentsSection({
     ? params.slug.join("/")
     : params.slug || "home";
 
-  const status = useQuery(api.comments.comments.getPostStatus, { postId });
-  const isLocked = status?.isLocked || false;
+  const [isLocked, setIsLocked] = useState(false);
 
   return (
     <div className="_remarks">
@@ -33,7 +31,10 @@ export default function CommentsSection({
         postId={customPostId ? customPostId : postId}
         isLocked={isLocked}
       />
-      <CommentsList postId={customPostId ? customPostId : postId} />
+      <CommentsList
+        postId={customPostId ? customPostId : postId}
+        onStatusChange={(status) => setIsLocked(status.isLocked)}
+      />
     </div>
   );
 }
