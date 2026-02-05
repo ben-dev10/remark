@@ -249,43 +249,50 @@ export default function CommentsList({
         totalComments={totalComments}
       />
 
-      <div className="_comments pb-15 dark:bg-[#0c0c0c] min-h-30 bg-[#fdfdfd] relative z-2 dark:border-border/70 border p-4 rounded-xl flex flex-col space-y-3">
-        {sortedTopLevel.map((comment) => (
-          <CommentThread
-            key={comment._id}
-            comment={comment}
-            postId={postId}
-            currentUserId={currentUserId}
-            repliesMap={repliesMap}
-            depth={0}
-            isLocked={isLocked}
-          />
-        ))}
-      </div>
+      <div
+        className={`_comments+actions rounded-3xl min-h-30 p-1.5 rounded-[calc(1rem+0.375rem)] dark:bg-black/50 bg-neutral-100`}
+      >
+        <div
+          className={`_comments pb-15 border dark:border-white/5 border-white ring-[1px] ring-[#191C21]/5 dark:ring-black/20 shadow-[0_1px_2px_0_rgba(25,28,33,.06),0_0_2px_0_--theme(--color-black/.08)] 
+            dark:shadow-[inset_0_0_1px_1px_--theme(--color-white/.01),0_1px_3px_0_--theme(--color-black/.4),0_0_3px_0_--theme(--color-black/.2)] dark:bg-[#0c0c0c] rounded-[1rem] bg-[#fdfdfd] p-4 flex flex-col space-y-3`}
+        >
+          {sortedTopLevel.map((comment) => (
+            <CommentThread
+              key={comment._id}
+              comment={comment}
+              postId={postId}
+              currentUserId={currentUserId}
+              repliesMap={repliesMap}
+              depth={0}
+              isLocked={isLocked}
+            />
+          ))}
+        </div>
 
-      <div className="_bottom-actions -mt-5 py-4 pt-5 border border-border/90 shadow-sm dark:shadow-black shadow-black/5 rounded-bl-xl rounded-br-xl dark:bg-black bg-neutral-100">
-        {hasMore && (
-          <div className="_load-more mt-6 flex justify-center">
-            <Button
-              onClick={handleLoadMore}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <ChevronDown className="w-4 h-4" />
-              Load More Comments (
-              {pagination?.totalTopLevel && sortedTopLevel.length
-                ? pagination.totalTopLevel - sortedTopLevel.length
-                : 0}{" "}
-              remaining)
-            </Button>
-          </div>
-        )}
+        <div className="_bottom-actions p-4 pb-3">
+          {hasMore && (
+            <div className="_load-more flex justify-center">
+              <Button
+                onClick={handleLoadMore}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <ChevronDown className="w-4 h-4" />
+                Load More Comments (
+                {pagination?.totalTopLevel && sortedTopLevel.length
+                  ? pagination.totalTopLevel - sortedTopLevel.length
+                  : 0}{" "}
+                remaining)
+              </Button>
+            </div>
+          )}
 
-        {!hasMore && displayComments.length > 0 && (
-          <div className="_end-of-comments pt-5 text-center text-sm text-muted-foreground">
-            <p>End of comments</p>
-          </div>
-        )}
+          {!hasMore && displayComments.length > 0 && (
+            <div className="_end-of-comments text-center text-sm text-muted-foreground">
+              <p>End of comments</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

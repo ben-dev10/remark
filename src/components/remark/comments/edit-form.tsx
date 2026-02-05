@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import type { Editor, JSONContent } from "@tiptap/react";
 import { toast } from "sonner";
-import { Save } from "lucide-react";
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOnline } from "@/hooks/use-online";
 import { useEditorPersistence } from "@/hooks/use-editor-persistence";
@@ -14,7 +14,8 @@ import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
 import { validateCommentContent } from "./validators";
 import { CommentId } from "@/utils/types/convex";
 import { COMMENTS_CONFIG } from "./config/comments";
-import { DiscardChangesDialog } from "./ui";
+import { CharacterCounter2, DiscardChangesDialog } from "./ui";
+import SpinnerRing180 from "@/icons/180-spinner";
 
 interface EditFormProps {
   commentId: CommentId;
@@ -156,20 +157,13 @@ export default function EditForm({
           className: "border-b rounded-md",
         }}
       >
-        <div className="_character-counter flex px-2 items-center gap-2">
-          {charCount > 0 && (
-            <span
-              className={`text-xs ${
-                isOverLimit
-                  ? "text-red-600 dark:text-red-400 font-semibold"
-                  : isNearLimit
-                    ? "text-yellow-600 dark:text-yellow-400"
-                    : "text-muted-foreground"
-              }`}
-            >
-              {charCount}/{COMMENTS_CONFIG.MAX_CHARACTERS}
-            </span>
-          )}
+        <div className="flex px-2 items-center gap-2">
+          <CharacterCounter2
+            isNearLimit={isNearLimit}
+            isOverLimit={isOverLimit}
+            current={charCount}
+            size={13}
+          />
 
           <Button
             type="button"
@@ -191,10 +185,19 @@ export default function EditForm({
               isOptimistic ||
               !hasChanges
             }
-            className="px-3 py-1 flex items-center gap-1 rounded-md disabled:opacity-50"
+            className="p-2 flex items-center gap-1 rounded-lg disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            {submitting ? "Saving…" : isOptimistic ? "Loading..." : "Save"}
+            {submitting ? (
+              <span className="flex items-center gap-1">
+                <SpinnerRing180 className="size-4.5" /> Saving...
+              </span>
+            ) : isOptimistic ? (
+              <span className="flex items-center gap-1">
+                <SpinnerRing180 className="size-4.5" /> Loading...
+              </span>
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </CommentEditor>

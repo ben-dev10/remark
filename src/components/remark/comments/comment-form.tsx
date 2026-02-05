@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { AuthSignInButton } from "../action-buttons";
+import { AuthSignInButton } from "../buttons";
 import { CommentEditor } from "./editor";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
@@ -15,6 +15,8 @@ import { STORAGE_KEYS } from "@/utils/lib/storage";
 import { useEditorPersistence } from "@/hooks/use-editor-persistence";
 import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
 import { COMMENTS_CONFIG } from "./config/comments";
+import SpinnerRing180 from "@/icons/180-spinner";
+import { CharacterCounter2 } from "./ui";
 
 interface CommentFormProps {
   postId: CreateComment["postId"];
@@ -49,13 +51,13 @@ export default function CommentsForm({
 
   async function handleSubmit() {
     const editor = editorRef.current;
-    if (!editor || editor.isEmpty) return;
 
     if (!isLoaded) {
       toast.error("Please wait while we verify your session...");
       return;
     }
 
+    if (!editor || editor.isEmpty) return;
     if (!isSignedIn) return;
 
     const validation = validateCommentContent(
@@ -126,25 +128,18 @@ export default function CommentsForm({
         placeholder={
           parentCommentId ? "Write a reply..." : "Write a comment..."
         }
-        containerProps={{ className: "rounded-lg" }}
+        containerProps={{ className: "rounded-lg shadow-md shadow-black/5" }}
       >
         {!isLocked ? (
-          <div className="_sign-in-btn flex items-center gap-1">
+          <div className="_editor-action-btns flex items-center gap-1">
             {isSignedIn ? (
               <>
-                {charCount > 0 && (
-                  <span
-                    className={`_character-counter text-xs ${
-                      isOverLimit
-                        ? "text-red-600 font-semibold"
-                        : isNearLimit
-                          ? "text-yellow-600"
-                          : "text-muted-foreground"
-                    }`}
-                  >
-                    {charCount}/{COMMENTS_CONFIG.MAX_CHARACTERS}
-                  </span>
-                )}
+                <CharacterCounter2
+                  isNearLimit={isNearLimit}
+                  isOverLimit={isOverLimit}
+                  current={charCount}
+                  size={13}
+                />
 
                 <Button
                   type="button"
@@ -165,20 +160,23 @@ export default function CommentsForm({
                     charCount === 0 ||
                     isOptimistic
                   }
-                  className="px-3 py-1 flex items-center gap-1 rounded-md disabled:opacity-50"
+                  className="p-2 flex min-w-max rounded-lg items-center justify-center gap-1 disabled:opacity-50"
                 >
-                  <Send className="w-4 h-4" />
-                  {submitting
-                    ? "Posting..."
-                    : parentCommentId
-                      ? "Reply"
-                      : "Comment"}
+                  {submitting ? (
+                    <span className="flex items-center gap-1">
+                      <SpinnerRing180 className="size-4.5" /> Posting...
+                    </span>
+                  ) : parentCommentId ? (
+                    "Reply"
+                  ) : (
+                    <Send className="size-4" />
+                  )}
                 </Button>
               </>
             ) : (
-              <div className="">
-                <AuthSignInButton />
-              </div>
+              <>
+                <AuthSignInButton charCount={charCount} />
+              </>
             )}
           </div>
         ) : (

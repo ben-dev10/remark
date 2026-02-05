@@ -17,6 +17,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import SpinnerRing180 from "@/icons/180-spinner";
+import { COMMENTS_CONFIG } from "./config/comments";
 
 export type SortOption =
   | "newest"
@@ -123,7 +125,13 @@ export function DeleteCommentDialog({
             disabled={isDeleting}
             className="bg-red-600 hover:bg-red-700 dark:text-white"
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isDeleting ? (
+              <span className="flex items-center gap-1">
+                <SpinnerRing180 className="size-4.5" /> Deleting...
+              </span>
+            ) : (
+              "Delete"
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -146,7 +154,9 @@ export function DiscardChangesDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Discard Changes</AlertDialogTitle>
+          <AlertDialogTitle className="text-[1.3rem]">
+            Discard Changes
+          </AlertDialogTitle>
           <AlertDialogDescription>
             You have unsaved changes. Discard them?
           </AlertDialogDescription>
@@ -165,5 +175,108 @@ export function DiscardChangesDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+type CircularCounterProps = {
+  current: number;
+  isOverLimit: boolean;
+  isNearLimit: boolean;
+};
+
+export function CharacterCounter({
+  current,
+  isOverLimit,
+  isNearLimit,
+}: CircularCounterProps) {
+  return (
+    <>
+      {current > 0 && (
+        <span
+          className={`_character-counter text-xs ${
+            isOverLimit
+              ? "text-red-600 dark:text-red-400 font-semibold"
+              : isNearLimit
+                ? "text-yellow-600 dark:text-yellow-400"
+                : "text-muted-foreground"
+          }`}
+        >
+          {current}/{COMMENTS_CONFIG.MAX_CHARACTERS}
+        </span>
+      )}
+    </>
+  );
+}
+
+type CircularCounterProps2 = {
+  current: number;
+  isOverLimit: boolean;
+  isNearLimit: boolean;
+  max?: number;
+  size?: number;
+  strokeWidth?: number;
+};
+
+export function CharacterCounter2({
+  current,
+  max = COMMENTS_CONFIG.MAX_CHARACTERS,
+  size = 18,
+  strokeWidth = 2,
+  isOverLimit,
+  isNearLimit,
+}: CircularCounterProps2) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.min(current / max, 1);
+  const dashOffset = circumference * (1 - progress);
+
+  return (
+    <>
+      {current > 0 && (
+        <div className=" flex items-center justify-center">
+          {isOverLimit && (
+            <small className=" text-red-600 dark:text-red-400 mr-2">
+              {max - current}
+            </small>
+          )}
+
+          <svg width={size} height={size} className="-rotate-90">
+            {/* background circle */}
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="transparent"
+              stroke="currentColor"
+              className="text-muted-foreground/20"
+              strokeWidth={strokeWidth}
+            />
+
+            {/* progress circle */}
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="transparent"
+              className={
+                isOverLimit
+                  ? "text-red-600 dark:text-red-400"
+                  : isNearLimit
+                    ? "text-yellow-600 dark:text-yellow-400"
+                    : "text-muted-foreground"
+              }
+              strokeWidth={strokeWidth}
+              strokeDasharray={circumference}
+              strokeDashoffset={dashOffset}
+              strokeLinecap="round"
+              style={{
+                transition: "stroke-dashoffset 150ms linear",
+              }}
+              stroke="currentColor"
+            />
+          </svg>
+        </div>
+      )}
+    </>
   );
 }

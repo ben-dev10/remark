@@ -16,7 +16,7 @@ export function Hero() {
             aria-hidden="true"
             src="/imgs/gradient-2.png"
             alt="gradient-img"
-            className="absolute left-1/2 -translate-x-[50%] mask-t-from-40% dark:opacity-20 opacity-30 -z-1 top-[calc(-144/16*1rem)] w-[calc(1463/16*1rem)] max-w-none"
+            className="absolute left-1/2 -translate-x-[50%] debug mask-radial-from-10% mask-radial-to-53% dark:opacity-20 opacity-30 -z-1 top-[calc(-144/16*1rem)] w-[calc(1463/16*1rem)] max-w-none"
             style={{ color: "transparent" }}
           />
         </Background>

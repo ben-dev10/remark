@@ -14,7 +14,11 @@ import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
 import { ParentCommentId } from "@/utils/types/convex";
 import { COMMENTS_CONFIG } from "./config/comments";
 import { validateCommentContent } from "./validators";
-import { DiscardChangesDialog } from "./ui";
+import {
+  CharacterCounter2,
+  DiscardChangesDialog,
+} from "./ui";
+import SpinnerRing180 from "@/icons/180-spinner";
 
 interface ReplyFormProps {
   postId: string;
@@ -162,20 +166,13 @@ export default function ReplyForm({
           className: "rounded-lg",
         }}
       >
-        <div className="flex px-2 items-center gap-2">
-          {charCount > 0 && (
-            <span
-              className={`_character-counter text-xs ${
-                isOverLimit
-                  ? "text-red-600 dark:text-red-400 font-semibold"
-                  : isNearLimit
-                    ? "text-yellow-600 dark:text-yellow-400"
-                    : "text-muted-foreground"
-              }`}
-            >
-              {charCount}/{COMMENTS_CONFIG.MAX_CHARACTERS}
-            </span>
-          )}
+        <div className="_editor-action-btns flex px-2 items-center gap-2">
+          <CharacterCounter2
+            isNearLimit={isNearLimit}
+            isOverLimit={isOverLimit}
+            current={charCount}
+            size={13}
+          />
 
           <Button
             type="button"
@@ -196,10 +193,19 @@ export default function ReplyForm({
               charCount === 0 ||
               isOptimistic
             }
-            className="px-3 py-1 flex items-center gap-1 rounded-md disabled:opacity-50"
+            className="p-2 flex items-center gap-1 rounded-lg disabled:opacity-50"
           >
-            <Send className="w-4 h-4" />
-            {submitting ? "Posting…" : isOptimistic ? "Loading..." : "Reply"}
+            {submitting ? (
+              <span className="flex items-center gap-1">
+                <SpinnerRing180 className="size-4.5" /> Posting...
+              </span>
+            ) : isOptimistic ? (
+              <span className="flex items-center gap-1">
+                <SpinnerRing180 className="size-4.5" /> Loading...
+              </span>
+            ) : (
+              <Send className="size-4" />
+            )}
           </Button>
         </div>
       </CommentEditor>

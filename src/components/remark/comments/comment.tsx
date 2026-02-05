@@ -107,7 +107,6 @@ const Comment = ({
               initialContent={comment.content}
               onCancel={handleCancelEdit}
               onSuccess={() => {
-                toast.success("Comment updated");
                 setIsEditing(false);
               }}
             />
@@ -161,7 +160,6 @@ const Comment = ({
                     </>
                   ) : (
                     <>
-                      {/* <Reply className="w-4 h-4" /> */}
                       Reply
                     </>
                   )}
@@ -174,14 +172,12 @@ const Comment = ({
                     onClick={handleEditClick}
                     className="flex items-center gap-1 font-medium text-muted-foreground hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors"
                   >
-                    {/* <Edit2 className="size-4" /> */}
                     Edit
                   </button>
                   <button
                     onClick={() => setShowDeleteDialog(true)}
                     className="flex items-center gap-1 font-medium text-muted-foreground hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   >
-                    {/* <Trash2 className="size-4" /> */}
                     Delete
                   </button>
                 </>
@@ -203,7 +199,6 @@ const Comment = ({
               parentCommentId={comment._id}
               onCancel={handleCancelReply}
               onSuccess={() => {
-                toast.success("Reply posted");
                 setIsReplying(false);
               }}
               replyingToUsername={comment.user?.username}

@@ -134,7 +134,7 @@ export function CommentThread({
               View {replies.length === 1 ? "reply" : "replies"} (
               {replies.length})
             </AccordionTrigger>
-            <AccordionContent>
+            <AccordionContent className="pb-0">
               <div className="ml-6 border-l border-muted-foreground/20 pl-4 pt-2">
                 <NestedReplies
                   replies={replies}
