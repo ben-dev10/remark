@@ -107,22 +107,20 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
 
     if (!editor) {
       return (
-        <div
-          className="_comment-editor-placeholder border rounded-lg p-3! h-25"
-          {...containerProps}
-        >
-          <p
-            {...props.editorProps}
-            className="text-muted-foreground animate-pulse mb-5"
-          >
-            {props.placeholder}
-          </p>
-
-          <div className="h-8 flex items-center justify-between">
-            <div className="w-30 rounded-md h-full bg-primary/5 animate-pulse" />
-            <div className="flex h-full">
-              <div className="w-10 mr-2 rounded-md h-full bg-primary/5 animate-pulse" />
-              <div className="w-15 rounded-md h-full bg-primary/5 animate-pulse" />
+        <div className="_comment-editor-placeholder h-25" {...containerProps}>
+          <div className="border rounded-lg p-3!">
+            <p
+              {...props.editorProps}
+              className="text-muted-foreground animate-pulse mb-5"
+            >
+              {props.placeholder}
+            </p>
+            <div className="h-8 flex items-center justify-between">
+              <div className="w-30 rounded-md h-full bg-primary/5 animate-pulse" />
+              <div className="flex h-full">
+                <div className="w-10 mr-2 rounded-md h-full bg-primary/5 animate-pulse" />
+                <div className="w-15 rounded-md h-full bg-primary/5 animate-pulse" />
+              </div>
             </div>
           </div>
         </div>
