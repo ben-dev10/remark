@@ -23,6 +23,17 @@ import { useOnline } from "@/hooks/use-online";
 import { Callout } from "fumadocs-ui/components/callout";
 import ChatIcon from "@/icons/chat-icon";
 
+type PaginatedResponse = {
+  total?: number;
+  hasMore?: boolean;
+  totalTopLevel?: number;
+};
+
+type CommentsStatus = {
+  isLocked?: boolean;
+  remaining?: number;
+};
+
 interface CommentListProps {
   postId: string;
   onStatusChange?: (status: { isLocked: boolean }) => void;
@@ -69,14 +80,52 @@ export default function CommentsList({
   );
 
   const accumulatedComments = result?.comments as CommentWithUser[] | undefined;
-  const pagination = result?.pagination;
-  const status = result?.status;
+  const pagination = result?.pagination as PaginatedResponse | undefined;
+  const status = result?.status as CommentsStatus | undefined;
+
+  // Preserve the last-known live values when refetching
+  const [liveComments, setLiveComments] = useState<
+    CommentWithUser[] | null | undefined
+  >(undefined);
+  const [livePagination, setLivePagination] = useState<
+    PaginatedResponse | undefined
+  >(undefined);
+  const [liveStatus, setLiveStatus] = useState<CommentsStatus | undefined>(
+    undefined,
+  );
+
+  /*
+   * useEffects to maintain current list and append new items without re-rendering comment-list
+   * when loading more comments.
+   */
+  useEffect(() => {
+    if (accumulatedComments !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLiveComments(accumulatedComments);
+    }
+  }, [accumulatedComments]);
 
   useEffect(() => {
-    if (status) {
-      onStatusChange?.({ isLocked: status.isLocked });
+    if (pagination !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLivePagination(pagination);
     }
-  }, [status, onStatusChange]);
+  }, [pagination]);
+
+  useEffect(() => {
+    if (status !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLiveStatus(status);
+    }
+  }, [status]);
+
+  useEffect(() => {
+    const current = status ?? liveStatus;
+    if (current) {
+      onStatusChange?.({ isLocked: !!current.isLocked });
+    }
+  }, [status, liveStatus, onStatusChange]);
+  //------------------------
 
   useEffect(() => {
     const cached = storageManager.getCachedComments(postId);
@@ -104,7 +153,9 @@ export default function CommentsList({
     setLoadedCount((prev) => prev + COMMENTS_CONFIG.PAGE_SIZE);
   };
 
-  const comments = isOnline ? accumulatedComments : cachedComments;
+  const comments = isOnline
+    ? (accumulatedComments ?? liveComments)
+    : cachedComments;
 
   // CASE 1: Not connected to internet
   if (!isOnline && !cachedComments) {
@@ -173,9 +224,12 @@ export default function CommentsList({
   const { topLevel, repliesMap } = organizeCommentsIntoThreads(displayComments);
   const sortedTopLevel = sortComments(topLevel, sortBy, repliesMap);
 
-  const totalComments = pagination?.total || displayComments.length;
-  const isLocked = status?.isLocked || false;
-  const hasMore = pagination?.hasMore || false;
+  const effectivePagination = pagination ?? livePagination;
+  const effectiveStatus = status ?? liveStatus;
+
+  const totalComments = effectivePagination?.total || displayComments.length;
+  const isLocked = effectiveStatus?.isLocked || false;
+  const hasMore = effectivePagination?.hasMore || false;
   const showWarning = isApproachingLimit(totalComments);
 
   return (
@@ -212,7 +266,7 @@ export default function CommentsList({
         </Callout>
       )}
 
-      {!isLocked && showWarning && status && (
+      {!isLocked && showWarning && effectiveStatus && (
         <Callout
           title="Approaching Limit"
           type="warn"
@@ -223,8 +277,8 @@ export default function CommentsList({
         >
           <p className="text-sm ">
             This discussion is approaching the maximum comment limit.{" "}
-            <span className="font-semibold">{status.remaining}</span> comments
-            remaining.
+            <span className="font-semibold">{effectiveStatus.remaining}</span>{" "}
+            comments remaining.
           </p>
         </Callout>
       )}
@@ -279,8 +333,8 @@ export default function CommentsList({
               >
                 <ChevronDown className="w-4 h-4" />
                 Load More Comments (
-                {pagination?.totalTopLevel && sortedTopLevel.length
-                  ? pagination.totalTopLevel - sortedTopLevel.length
+                {effectivePagination?.totalTopLevel && sortedTopLevel.length
+                  ? effectivePagination.totalTopLevel - sortedTopLevel.length
                   : 0}{" "}
                 remaining)
               </Button>
