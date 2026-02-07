@@ -26,7 +26,7 @@ interface StorageData {
   timestamp: number;
 }
 
-class StorageManager {
+class Storage {
   //----------------- EDITOR & FORMS --------------------//
   // expiration time (default: 7 days)
   private expirationMs: number = 7 * 24 * 60 * 60 * 1000;
@@ -327,5 +327,5 @@ class StorageManager {
 }
 
 // export singleton instance
-export const storageManager = new StorageManager();
+export const storage = new Storage();
 export type { StorageData };

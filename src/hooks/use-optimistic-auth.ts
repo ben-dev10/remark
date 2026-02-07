@@ -1,6 +1,6 @@
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { storageManager } from "@/utils/lib/storage";
+import { storage } from "@/utils/lib/storage";
 
 /**
  * Hook that provides optimistic auth state: shows cached auth state immediately,
@@ -10,7 +10,7 @@ export function useOptimisticAuth() {
   const { isSignedIn, isLoaded, user } = useUser();
 
   const [optimisticSignedIn, setOptimisticSignedIn] = useState<boolean>(() => {
-    const cached = storageManager.getCachedAuthState();
+    const cached = storage.getCachedAuthState();
     return cached ?? false;
   });
 
@@ -18,7 +18,7 @@ export function useOptimisticAuth() {
     if (isLoaded) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setOptimisticSignedIn(isSignedIn);
-      storageManager.cacheAuthState(isSignedIn);
+      storage.cacheAuthState(isSignedIn);
     }
   }, [isLoaded, isSignedIn]);
 

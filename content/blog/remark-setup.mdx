@@ -89,6 +89,20 @@ Before starting, clone the source code from <Link href={`${GITHUB_LINK}/remark`}
             DRAFT_SAVE_DELAY: 500,
           } as const;
           ```
+
+          Entry point to the comment application:
+          ```tsx
+          import CommentSection from "@/components/remark"
+
+          export default function App(){
+          return(
+            <div>
+            {/* customPostId?: string - use this if you want a custom id for a particular instance of the 
+                comment-section app, it defaults to the slug of the current page */}
+              <CommentSection customPostId="homepage-comments" />
+            </div>
+          )}
+          ```
     </div>
 
 </section>

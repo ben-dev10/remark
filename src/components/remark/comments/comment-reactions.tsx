@@ -49,15 +49,9 @@ export default function CommentReactions({ commentId }: CommentReactionsProps) {
 
   if (!counts) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <ThumbsUp className="w-4 h-4" />
-          <span>-</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <ThumbsDown className="w-4 h-4" />
-          <span>-</span>
-        </div>
+      <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+        <ThumbsUp className="size-4 opacity-50" />
+        <ThumbsDown className="size-4 opacity-50" />
       </div>
     );
   }

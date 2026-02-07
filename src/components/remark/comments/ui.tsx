@@ -19,6 +19,48 @@ import {
 } from "@/components/ui/alert-dialog";
 import SpinnerRing180 from "@/icons/180-spinner";
 import { COMMENTS_CONFIG } from "./config/comments";
+import { cva } from "class-variance-authority";
+
+export const inputVariants = cva(
+  "appearance-none px-2 py-1.5 placeholder:text-muted-foreground focus-visible:outline-none",
+  {
+    variants: {
+      variant: {
+        ghost: "px-4 py-3.5 border-b",
+        default:
+          "rounded-md border border-border bg-background focus-visible:ring-2 focus-visible:ring-ring",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
+
+export const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-lg font-medium cursor-pointer disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+  {
+    variants: {
+      size: {
+        small: "h-8 px-2 text-xs",
+        medium: "px-3 py-2 text-sm",
+        default: "h-8 min-w-20 text-sm",
+        icon: "size-7 rounded-md",
+      },
+      variant: {
+        primary:
+          "bg-primary text-primary-foreground transition-colors hover:bg-primary/80",
+        secondary:
+          "border border-border bg-card transition-colors hover:bg-accent",
+        ghost: "transition-colors hover:bg-accent/80",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+      size: "default",
+    },
+  },
+);
 
 export type SortOption =
   | "newest"
@@ -104,13 +146,13 @@ export function DeleteCommentDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-[1.3rem]">
+          <AlertDialogTitle className="text-[1.4rem] mb-0.5">
             Delete Comment
           </AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this comment? This action cannot be
             undone.
-            <span className="block mt-5 text-xs text-muted-foreground">
+            <span className="block mt-5  text-muted-foreground">
               <b>Note:</b> Replies to this comment will remain visible.
             </span>
           </AlertDialogDescription>
@@ -154,10 +196,10 @@ export function DiscardChangesDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-[1.3rem]">
+          <AlertDialogTitle className="text-[1.4rem] mb-0.5">
             Discard Changes
           </AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="mb-10">
             You have unsaved changes. Discard them?
           </AlertDialogDescription>
         </AlertDialogHeader>

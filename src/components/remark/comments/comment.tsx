@@ -3,10 +3,9 @@ import { api } from "@/convex/_generated/api";
 import { formatTimeAgo } from "@/utils/lib/format-time";
 import { CommentWithUser } from "@/utils/types/convex";
 import { useMutation } from "convex/react";
-import { Edit2, Reply, Trash2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useState } from "react";
 import UserAvatar from "../avatar";
-import ContentRenderer from "./content-renderer";
 import { useOptimisticAuth } from "@/hooks/use-optimistic-auth";
 import { toast } from "sonner";
 import EditForm from "./edit-form";
@@ -15,6 +14,9 @@ import { Button } from "@/components/ui/button";
 import { DeleteCommentDialog } from "./ui";
 import CommentReactions from "./comment-reactions";
 import { COMMENTS_CONFIG } from "./config/comments";
+import { ContentRenderer } from "./content-renderer";
+import parseTipTapContent from "@/utils/lib/parse-tiptap";
+import { JSONContent } from "@tiptap/react";
 
 export interface CommentProps {
   comment: CommentWithUser;
@@ -84,9 +86,19 @@ const Comment = ({
     return (
       <div className="_deleted-comment-placeholder space-y-3">
         <div className="flex gap-3">
-          <div className="w-10 h-10 rounded-full bg-muted" />
+          <div className="w-10 h-10 rounded-full bg-muted">
+            <UserAvatar user={comment.user} />
+          </div>
           <div className="flex-1 min-w-0">
             <div className=" rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-semibold">
+                  {comment.user?.username || "Deleted user"}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {formatTimeAgo(comment.createdAt)}
+                </span>
+              </div>
               <p className="text-muted-foreground italic text-sm">
                 This comment has been deleted
               </p>
@@ -136,7 +148,11 @@ const Comment = ({
                 )}
               </div>
 
-              <ContentRenderer content={comment.content} />
+              <ContentRenderer
+                content={parseTipTapContent(
+                  comment.content as unknown as JSONContent,
+                )}
+              />
             </div>
 
             <div className="_comment-action-btns pl-5 flex items-center gap-4 mt-2 text-sm">
@@ -159,9 +175,7 @@ const Comment = ({
                       </div>
                     </>
                   ) : (
-                    <>
-                      Reply
-                    </>
+                    <>Reply</>
                   )}
                 </button>
               )}

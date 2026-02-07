@@ -8,6 +8,7 @@
 @import "fumadocs-ui/css/preset.css";
 
 @import "../styles/editor.css";
+@import "../styles/tokyo-night.css";
 
 @import "@clerk/themes/shadcn.css";
 

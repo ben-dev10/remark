@@ -11,7 +11,13 @@ import {
 } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import { Bold, Code, Italic, LinkIcon, Strikethrough } from "lucide-react";
+import {
+  Bold,
+  Code as CodeIcon,
+  Italic,
+  LinkIcon,
+  Strikethrough,
+} from "lucide-react";
 import { cn } from "@/utils/lib/utils";
 import { cva } from "class-variance-authority";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -22,6 +28,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { HyperLink } from "./hyper-links";
+import { lowlight } from "@/utils/lib/syntax-highlighter";
+import { codeBlockVariants, codeVariants } from "../content-renderer";
+import { Code } from "@tiptap/extension-code";
+import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 
 export type CommentEditorProps = Editor;
 
@@ -76,6 +86,18 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
           Placeholder.configure({
             placeholder: propsRef.current.placeholder || "Write a comment…",
             showOnlyWhenEditable: true,
+          }),
+          CodeBlockLowlight.configure({
+            lowlight,
+            defaultLanguage: "plaintext",
+            HTMLAttributes: {
+              class: codeBlockVariants(),
+            },
+          }),
+          Code.configure({
+            HTMLAttributes: {
+              class: codeVariants(),
+            },
           }),
         ],
         content: propsRef.current.defaultValue || "",
@@ -140,7 +162,7 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
         <EditorContent
           editor={editor}
           {...props.editorProps}
-          className="tiptap rounded-md"
+          className={cn("tiptap rounded-md", props.editorProps?.className)}
         />
 
         <div className="_btns flex mt-2 items-center justify-between">
@@ -163,7 +185,7 @@ export const CommentEditor = forwardRef<HTMLDivElement, EditorProps>(
             <MarkButton
               editor={editor}
               name="code"
-              icon={<Code className="size-4" />}
+              icon={<CodeIcon className="size-4" />}
             />
 
             <div className="_divider border-l my-0.5 border-primary/50 mx-2" />

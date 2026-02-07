@@ -9,7 +9,6 @@ export const getCommentsByPost = query({
     const comments = await ctx.db
       .query("comments")
       .withIndex("by_postId", (q) => q.eq("postId", args.postId))
-      .filter((q) => q.neq(q.field("isDeleted"), true))
       .collect();
 
     const commentsWithUsers = await Promise.all(

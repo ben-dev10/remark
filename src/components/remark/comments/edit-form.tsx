@@ -156,6 +156,9 @@ export default function EditForm({
         containerProps={{
           className: "border-b rounded-md",
         }}
+        editorProps={{
+          className: "_edit-form-editor",
+        }}
       >
         <div className="flex px-2 items-center gap-2">
           <CharacterCounter2

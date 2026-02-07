@@ -14,7 +14,7 @@ import {
   Archive,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { storageManager } from "@/utils/lib/storage";
+import { storage } from "@/utils/lib/storage";
 import { CommentSortSelector, SortOption } from "./ui";
 import { sortComments } from "./comment-sorting";
 import { CommentThread, organizeCommentsIntoThreads } from "./comment-thread";
@@ -82,7 +82,6 @@ export default function CommentsList({
   const accumulatedComments = result?.comments as CommentWithUser[] | undefined;
   const pagination = result?.pagination as PaginatedResponse | undefined;
   const status = result?.status as CommentsStatus | undefined;
-
   // Preserve the last-known live values when refetching
   const [liveComments, setLiveComments] = useState<
     CommentWithUser[] | null | undefined
@@ -95,7 +94,7 @@ export default function CommentsList({
   );
 
   /*
-   * useEffects to maintain current list and append new items without re-rendering comment-list
+   * useEffects(next 4) to maintain current list and append new items without re-rendering comment-list
    * when loading more comments.
    */
   useEffect(() => {
@@ -125,10 +124,9 @@ export default function CommentsList({
       onStatusChange?.({ isLocked: !!current.isLocked });
     }
   }, [status, liveStatus, onStatusChange]);
-  //------------------------
 
   useEffect(() => {
-    const cached = storageManager.getCachedComments(postId);
+    const cached = storage.getCachedComments(postId);
     if (cached) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCachedComments(cached);
@@ -138,7 +136,7 @@ export default function CommentsList({
   // update cache when live data arrives
   useEffect(() => {
     if (accumulatedComments && accumulatedComments.length > 0) {
-      storageManager.cacheComments(postId, accumulatedComments);
+      storage.cacheComments(postId, accumulatedComments);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCachedComments(accumulatedComments);
     }
@@ -242,12 +240,6 @@ export default function CommentsList({
               ? "You're offline. Showing cached comments."
               : "You're offline. Comments will sync when you reconnect."}
           </span>
-          {isOnline && (
-            <div className="flex items-center ml-8 gap-1 text-green-600 dark:text-green-300">
-              <Wifi className="w-4 h-4" />
-              <span className="text-xs">Reconnecting...</span>
-            </div>
-          )}
         </div>
       )}
 

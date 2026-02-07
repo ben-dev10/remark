@@ -33,7 +33,34 @@ export function organizeCommentsIntoThreads(comments: CommentWithUser[]) {
     }
   });
 
+  // Sort top-level and reply lists so latest comments appear first
+  const sortDesc = (a: CommentWithUser, b: CommentWithUser) =>
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+  topLevel.sort(sortDesc);
+
+  for (const [key, arr] of repliesMap.entries()) {
+    arr.sort(sortDesc);
+    repliesMap.set(key, arr);
+  }
+
   return { topLevel, repliesMap };
+}
+
+function hasVisibleDescendants(
+  commentId: string,
+  repliesMap: Map<string, CommentWithUser[]>,
+): boolean {
+  const stack = [...(repliesMap.get(commentId) || [])];
+
+  while (stack.length) {
+    const node = stack.shift()!;
+    if (!node.isDeleted) return true;
+    const children = repliesMap.get(node._id) || [];
+    if (children.length) stack.push(...children);
+  }
+
+  return false;
 }
 
 // Recursive component to render nested replies without accordion
@@ -54,9 +81,16 @@ function NestedReplies({
   depth,
   isLocked = false,
 }: NestedRepliesProps) {
+  // Filter out replies that are deleted and have no visible descendants
+  const visibleReplies = replies.filter(
+    (r) => !r.isDeleted || hasVisibleDescendants(r._id, repliesMap),
+  );
+
+  if (visibleReplies.length === 0) return null;
+
   return (
     <>
-      {replies.map((reply) => {
+      {visibleReplies.map((reply) => {
         const nestedReplies = repliesMap.get(reply._id) || [];
         const hasNestedReplies = nestedReplies.length > 0;
 
@@ -107,7 +141,16 @@ export function CommentThread({
   isLocked = false,
 }: CommentThreadProps) {
   const replies = repliesMap.get(comment._id) || [];
-  const hasReplies = replies.length > 0;
+
+  const visibleReplies = replies.filter(
+    (r) => !r.isDeleted || hasVisibleDescendants(r._id, repliesMap),
+  );
+
+  if (comment.isDeleted && !hasVisibleDescendants(comment._id, repliesMap)) {
+    return null;
+  }
+
+  const hasReplies = visibleReplies.length > 0;
 
   return (
     <div className="space-y-4">
@@ -131,13 +174,13 @@ export function CommentThread({
             className="border-none mb-0! [&_h3]:m-0!"
           >
             <AccordionTrigger className="p-1 ml-4 mb-0! text-sm max-w-max text-muted-foreground hover:text-foreground hover:no-underline">
-              View {replies.length === 1 ? "reply" : "replies"} (
-              {replies.length})
+              View {visibleReplies.length === 1 ? "reply" : "replies"} (
+              {visibleReplies.length})
             </AccordionTrigger>
             <AccordionContent className="pb-0">
               <div className="ml-6 border-l border-muted-foreground/20 pl-4 pt-2">
                 <NestedReplies
-                  replies={replies}
+                  replies={visibleReplies}
                   postId={postId}
                   currentUserId={currentUserId}
                   repliesMap={repliesMap}

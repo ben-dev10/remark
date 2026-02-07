@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from "react";
 import { Editor, JSONContent } from "@tiptap/react";
-import { storageManager } from "@/utils/lib/storage";
+import { storage } from "@/utils/lib/storage";
 
 interface UseEditorPersistenceOptions {
   /**
@@ -61,7 +61,7 @@ export function useEditorPersistence(
 
       // Set new timer
       debounceTimerRef.current = setTimeout(() => {
-        storageManager.saveEditorDraft(editorId, content);
+        storage.saveEditorDraft(editorId, content);
         onSave?.(content);
       }, debounceMs);
     },
@@ -72,14 +72,14 @@ export function useEditorPersistence(
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-    storageManager.clearEditorDraft(editorId);
+    storage.clearEditorDraft(editorId);
     hasRestoredRef.current = false;
   }, [editorId]);
 
   const restoreDraft = useCallback(() => {
     if (!enabled || !editor || hasRestoredRef.current) return false;
 
-    const savedContent = storageManager.loadEditorDraft(editorId);
+    const savedContent = storage.loadEditorDraft(editorId);
 
     if (savedContent) {
       isRestoringRef.current = true;
@@ -95,7 +95,7 @@ export function useEditorPersistence(
   }, [editor, editorId, enabled, onRestore]);
 
   const hasDraft = useCallback(() => {
-    return storageManager.hasDraft(editorId);
+    return storage.hasDraft(editorId);
   }, [editorId]);
 
   // Restore draft on mount - only once
@@ -143,7 +143,7 @@ export function useEditorPersistence(
         if (debounceTimerRef.current) {
           clearTimeout(debounceTimerRef.current);
         }
-        storageManager.saveEditorDraft(editorId, content);
+        storage.saveEditorDraft(editorId, content);
         onSave?.(content);
       }
     },
